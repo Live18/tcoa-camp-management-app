@@ -8,6 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { UserSwitcher } from "@/components/user/UserSwitcher";
 
 export const NavBar: React.FC = () => {
   const navigate = useNavigate();
@@ -62,6 +63,9 @@ export const NavBar: React.FC = () => {
           </div>
         </div>
         <div className="flex-1" />
+        <div className="mr-4">
+          <UserSwitcher />
+        </div>
         <nav className="hidden md:flex gap-6 mr-6">
           <Button
             variant="ghost"

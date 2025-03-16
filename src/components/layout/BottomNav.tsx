@@ -3,10 +3,12 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, User, Calendar, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePermission } from "@/contexts/PermissionContext";
 
 export const BottomNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { can } = usePermission();
 
   const navItems = [
     {
@@ -24,12 +26,16 @@ export const BottomNav: React.FC = () => {
       icon: Calendar,
       path: "/meetings",
     },
-    {
+  ];
+
+  // Add admin section only if user has permission
+  if (can("user.view")) {
+    navItems.push({
       label: "Admin",
       icon: Settings,
       path: "/admin",
-    },
-  ];
+    });
+  }
 
   return (
     <div className="md:hidden fixed bottom-0 w-full border-t bg-background z-10">
