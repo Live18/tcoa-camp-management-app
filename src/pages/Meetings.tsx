@@ -12,25 +12,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, Users } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Meetings = () => {
   const navigate = useNavigate();
   const { meetings } = useMeeting();
-  const { currentUser } = useUser();
+  const { currentUser, users } = useUser();
 
   // Sort meetings by date, newest first
   const sortedMeetings = [...meetings].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
-  // Filter meetings for current user if not admin
-  const userMeetings = currentUser?.isAdmin 
-    ? sortedMeetings 
-    : sortedMeetings.filter(meeting => 
-        meeting.attendees.some(attendee => attendee.userId === currentUser?.id)
-      );
+  // For attendees, show all meetings. For others, filter based on role
+  const userMeetings = currentUser?.role === "attendee"
+    ? sortedMeetings
+    : currentUser?.isAdmin 
+      ? sortedMeetings 
+      : sortedMeetings.filter(meeting => 
+          meeting.attendees.some(attendee => attendee.userId === currentUser?.id)
+        );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -60,6 +63,21 @@ const Meetings = () => {
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map(part => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
+  const findPresenters = (meeting: any) => {
+    return meeting.attendees
+      .filter(att => att.role === "presenter")
+      .map(att => users.find(u => u.id === att.userId))
+      .filter(Boolean);
+  };
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center justify-between mb-6">
@@ -79,6 +97,9 @@ const Meetings = () => {
               attendee => attendee.userId === currentUser?.id
             );
             const userRole = userAttendee?.role || "attendee";
+            
+            // Get presenters for this meeting
+            const presenters = findPresenters(meeting);
 
             return (
               <Card key={meeting.id} className="flex flex-col">
@@ -106,11 +127,32 @@ const Meetings = () => {
                         {meeting.currentAttendees} / {meeting.maxAttendees} attendees
                       </span>
                     </div>
-                    <div className="mt-4">
-                      <Badge className={getRoleColor(userRole)}>
-                        Your role: {userRole}
-                      </Badge>
-                    </div>
+                    
+                    {/* Show presenters for all users */}
+                    {presenters.length > 0 && (
+                      <div className="mt-2">
+                        <div className="text-sm font-medium mb-1">Presenters:</div>
+                        <div className="flex flex-wrap gap-2">
+                          {presenters.map(presenter => (
+                            <div key={presenter.id} className="flex items-center">
+                              <Avatar className="h-6 w-6 mr-1">
+                                <AvatarImage src={presenter.photoUrl} alt={presenter.name} />
+                                <AvatarFallback>{getInitials(presenter.name)}</AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm">{presenter.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {userAttendee && (
+                      <div className="mt-4">
+                        <Badge className={getRoleColor(userRole)}>
+                          Your role: {userRole}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter>

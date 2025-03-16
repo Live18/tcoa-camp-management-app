@@ -5,6 +5,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useMeeting } from "@/contexts/MeetingContext";
 import { usePermission } from "@/contexts/PermissionContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
+import { useRoleCheck } from "@/hooks/useRoleCheck";
 import {
   Card,
   CardContent,
@@ -14,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Users, Calendar, Upload, Bell, Mail, Brush } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -21,14 +23,22 @@ const AdminDashboard = () => {
   const { users } = useUser();
   const { meetings } = useMeeting();
   const { can } = usePermission();
+  const { isAdmin } = useRoleCheck();
 
   return (
     <PermissionGate
-      action={["user.view", "meeting.view"]}
+      action="user.view"
       redirectTo="/"
     >
       <div className="container mx-auto py-6">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          {!isAdmin && (
+            <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-300">
+              View Only Mode
+            </Badge>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {can("user.view") && (
@@ -51,9 +61,10 @@ const AdminDashboard = () => {
                   <Button 
                     onClick={() => navigate("/admin/users")}
                     className="w-full"
-                    disabled={!can("user.view")}
+                    variant={isAdmin ? "default" : "outline"}
+                    disabled={!can("user.edit")}
                   >
-                    Manage Users
+                    {isAdmin ? "Manage Users" : "View Users"}
                   </Button>
                   <Button 
                     variant="outline"
@@ -88,9 +99,10 @@ const AdminDashboard = () => {
                   <Button 
                     onClick={() => navigate("/admin/meetings")}
                     className="w-full"
-                    disabled={!can("meeting.view")}
+                    variant={isAdmin ? "default" : "outline"}
+                    disabled={!can("meeting.edit")}
                   >
-                    Manage Meetings
+                    {isAdmin ? "Manage Meetings" : "View Meetings"}
                   </Button>
                   <Button 
                     variant="outline"

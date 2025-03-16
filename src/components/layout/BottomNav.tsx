@@ -28,7 +28,8 @@ export const BottomNav: React.FC = () => {
     },
   ];
 
-  // Add admin section only if user has permission
+  // Add admin section for users who can view the admin dashboard
+  // This now includes admins, presenters, and observers
   if (can("user.view")) {
     navItems.push({
       label: "Admin",

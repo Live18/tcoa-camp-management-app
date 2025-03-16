@@ -9,9 +9,11 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { UserSwitcher } from "@/components/user/UserSwitcher";
+import { usePermission } from "@/contexts/PermissionContext";
 
 export const NavBar: React.FC = () => {
   const navigate = useNavigate();
+  const { can } = usePermission();
 
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background">
@@ -46,13 +48,15 @@ export const NavBar: React.FC = () => {
                 >
                   Meetings
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => navigate("/admin")}
-                >
-                  Admin Dashboard
-                </Button>
+                {can("user.view") && (
+                  <Button
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => navigate("/admin")}
+                  >
+                    Admin Dashboard
+                  </Button>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
@@ -85,12 +89,14 @@ export const NavBar: React.FC = () => {
           >
             Meetings
           </Button>
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/admin")}
-          >
-            Admin
-          </Button>
+          {can("user.view") && (
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/admin")}
+            >
+              Admin
+            </Button>
+          )}
         </nav>
       </div>
     </header>

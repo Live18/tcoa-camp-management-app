@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, ReactNode } from "react";
 import { useUser, UserRole } from "@/contexts/UserContext";
 
@@ -56,7 +55,9 @@ const rolePermissions: Record<UserRole, PermissionAction[]> = {
     // Presenters can view users, view/edit their meetings, view documents
     "user.view",
     "meeting.view", "meeting.edit",
-    "document.view"
+    "document.view",
+    // New: Allow presenters to view the admin dashboard
+    "user.view", "meeting.view", "document.view", "notification.send"
   ],
   evaluator: [
     // Evaluators can view users, view meetings, view documents
@@ -65,9 +66,11 @@ const rolePermissions: Record<UserRole, PermissionAction[]> = {
     "document.view"
   ],
   observer: [
-    // Observers can only view meetings and documents
+    // Observers can view meetings, documents and now admin dashboard (read-only)
     "meeting.view",
-    "document.view"
+    "document.view",
+    // New: Allow observers to view the admin dashboard
+    "user.view"
   ],
   attendee: [
     // Regular attendees can only view meetings they're part of
