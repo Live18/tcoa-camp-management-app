@@ -3,6 +3,8 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMeeting } from "@/contexts/MeetingContext";
 import { useUser } from "@/contexts/UserContext";
+import { usePermission } from "@/contexts/PermissionContext";
+import { PermissionGate } from "@/components/auth/PermissionGate";
 import {
   Card,
   CardContent,
@@ -20,7 +22,8 @@ const MeetingDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getMeeting } = useMeeting();
-  const { users, currentUser } = useUser();
+  const { users } = useUser();
+  const { can } = usePermission();
 
   const meeting = getMeeting(id || "");
 
@@ -119,25 +122,29 @@ const MeetingDetails = () => {
                 </div>
               </div>
             </CardContent>
-            {currentUser?.isAdmin && (
+            <PermissionGate action={["meeting.edit", "notification.send"]}>
               <CardFooter>
                 <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 w-full">
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => navigate(`/admin/meetings/edit/${meeting.id}`)}
-                  >
-                    Edit
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    Send Notification
-                  </Button>
+                  <PermissionGate action="meeting.edit">
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate(`/admin/meetings/edit/${meeting.id}`)}
+                    >
+                      Edit
+                    </Button>
+                  </PermissionGate>
+                  <PermissionGate action="notification.send">
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      Send Notification
+                    </Button>
+                  </PermissionGate>
                 </div>
               </CardFooter>
-            )}
+            </PermissionGate>
           </Card>
         </div>
 
@@ -172,7 +179,7 @@ const MeetingDetails = () => {
                 })}
               </div>
             </CardContent>
-            {currentUser?.isAdmin && (
+            <PermissionGate action="meeting.manage_attendees">
               <CardFooter>
                 <Button 
                   variant="outline" 
@@ -182,7 +189,7 @@ const MeetingDetails = () => {
                   Manage Attendees
                 </Button>
               </CardFooter>
-            )}
+            </PermissionGate>
           </Card>
         </div>
       </div>

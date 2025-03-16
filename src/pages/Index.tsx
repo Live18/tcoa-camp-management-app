@@ -5,12 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import { useMeeting } from "@/contexts/MeetingContext";
+import { usePermission } from "@/contexts/PermissionContext";
 import { Calendar, Users } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const { meetings } = useMeeting();
+  const { can } = usePermission();
 
   const upcomingMeetings = meetings
     .filter(meeting => new Date(meeting.date) > new Date())
@@ -39,7 +41,7 @@ const Index = () => {
                   >
                     View Profile
                   </Button>
-                  {currentUser.isAdmin && (
+                  {can("user.view") && (
                     <Button 
                       onClick={() => navigate("/admin")}
                       className="w-full md:w-auto"
@@ -105,7 +107,7 @@ const Index = () => {
             </Card>
           </div>
 
-          {currentUser.isAdmin && (
+          {can("user.view") && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
@@ -122,6 +124,7 @@ const Index = () => {
                     variant="outline" 
                     onClick={() => navigate("/admin/users")}
                     className="w-full"
+                    disabled={!can("user.view")}
                   >
                     Manage Users
                   </Button>
@@ -129,6 +132,7 @@ const Index = () => {
                     variant="outline" 
                     onClick={() => navigate("/admin/invitations")}
                     className="w-full"
+                    disabled={!can("invitation.send")}
                   >
                     Send Invitations
                   </Button>
@@ -136,6 +140,7 @@ const Index = () => {
                     variant="outline" 
                     onClick={() => navigate("/admin/meetings")}
                     className="w-full"
+                    disabled={!can("meeting.view")}
                   >
                     Manage Meetings
                   </Button>
