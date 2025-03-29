@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, User, Calendar, Settings } from "lucide-react";
+import { Home, User, GameController, BookOpen, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermission } from "@/contexts/PermissionContext";
 
@@ -22,14 +22,18 @@ export const BottomNav: React.FC = () => {
       path: "/profile",
     },
     {
-      label: "Meetings",
-      icon: Calendar,
-      path: "/meetings",
+      label: "Games",
+      icon: GameController,
+      path: "/games",
+    },
+    {
+      label: "Sessions",
+      icon: BookOpen,
+      path: "/classroom-sessions",
     },
   ];
 
   // Add admin section for users who can view the admin dashboard
-  // This now includes admins, presenters, and observers
   if (can("user.view")) {
     navItems.push({
       label: "Admin",

@@ -2,7 +2,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
-import { useMeeting } from "@/contexts/MeetingContext";
+import { useGame } from "@/contexts/GameContext";
+import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
+import { useLocation } from "@/contexts/LocationContext";
 import { usePermission } from "@/contexts/PermissionContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import { useRoleCheck } from "@/hooks/useRoleCheck";
@@ -16,14 +18,20 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, Upload, Bell, Mail, Brush } from "lucide-react";
+import { Users, GameController, BookOpen, MapPin, Bell, Mail, UserPlus } from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { users } = useUser();
-  const { meetings } = useMeeting();
+  const { games, getUnpublishedAttendees: getUnpublishedGameAttendees } = useGame();
+  const { sessions, getUnpublishedAttendees: getUnpublishedSessionAttendees } = useClassroomSession();
+  const { locations } = useLocation();
   const { can } = usePermission();
   const { isAdmin } = useRoleCheck();
+
+  const unpublishedGameAttendees = getUnpublishedGameAttendees();
+  const unpublishedSessionAttendees = getUnpublishedSessionAttendees();
+  const totalUnpublishedAttendees = unpublishedGameAttendees + unpublishedSessionAttendees;
 
   return (
     <PermissionGate
@@ -40,6 +48,29 @@ const AdminDashboard = () => {
           )}
         </div>
 
+        {totalUnpublishedAttendees > 0 && (
+          <Card className="mb-6 border-yellow-300 bg-yellow-50">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-yellow-800">Unpublished Assignments</h3>
+                  <p className="text-sm text-yellow-700">
+                    You have {totalUnpublishedAttendees} unpublished assignments
+                    ({unpublishedGameAttendees} for games, {unpublishedSessionAttendees} for sessions)
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="bg-white border-yellow-300 text-yellow-800"
+                  onClick={() => navigate("/admin/assignments")}
+                >
+                  Review Assignments
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {can("user.view") && (
             <Card>
@@ -47,7 +78,7 @@ const AdminDashboard = () => {
                 <div className="space-y-1">
                   <CardTitle>User Management</CardTitle>
                   <CardDescription>
-                    Manage event attendees
+                    Manage camp users
                   </CardDescription>
                 </div>
                 <Users className="h-5 w-5 text-muted-foreground" />
@@ -79,68 +110,154 @@ const AdminDashboard = () => {
             </Card>
           )}
 
-          {can("meeting.view") && (
+          {can("location.view") && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
-                  <CardTitle>Meeting Management</CardTitle>
+                  <CardTitle>Location Management</CardTitle>
                   <CardDescription>
-                    Organize and schedule meetings
+                    Manage camp locations
                   </CardDescription>
                 </div>
-                <Calendar className="h-5 w-5 text-muted-foreground" />
+                <MapPin className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent className="pb-2">
-                <div className="text-2xl font-bold">{meetings.length}</div>
-                <p className="text-muted-foreground">Active meetings</p>
+                <div className="text-2xl font-bold">{locations.length}</div>
+                <p className="text-muted-foreground">Active locations</p>
               </CardContent>
               <CardFooter>
                 <div className="flex flex-col space-y-2 w-full">
                   <Button 
-                    onClick={() => navigate("/admin/meetings")}
+                    onClick={() => navigate("/admin/locations")}
                     className="w-full"
                     variant={isAdmin ? "default" : "outline"}
-                    disabled={!can("meeting.edit")}
+                    disabled={!can("location.edit")}
                   >
-                    {isAdmin ? "Manage Meetings" : "View Meetings"}
+                    {isAdmin ? "Manage Locations" : "View Locations"}
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => navigate("/admin/meetings/new")}
+                    onClick={() => navigate("/admin/locations/new")}
                     className="w-full"
-                    disabled={!can("meeting.create")}
+                    disabled={!can("location.create")}
                   >
-                    Create Meeting
+                    Add Location
                   </Button>
                 </div>
               </CardFooter>
             </Card>
           )}
 
-          {can("document.upload") && (
+          {can("game.view") && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
-                  <CardTitle>Data Import</CardTitle>
+                  <CardTitle>Game Management</CardTitle>
                   <CardDescription>
-                    Import user and meeting data
+                    Organize and schedule games
                   </CardDescription>
                 </div>
-                <Upload className="h-5 w-5 text-muted-foreground" />
+                <GameController className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Upload spreadsheets to import user and meeting data
-                </p>
+              <CardContent className="pb-2">
+                <div className="text-2xl font-bold">{games.length}</div>
+                <p className="text-muted-foreground">Active games</p>
+                {unpublishedGameAttendees > 0 && (
+                  <Badge className="bg-yellow-100 text-yellow-800 mt-2">
+                    {unpublishedGameAttendees} unpublished assignments
+                  </Badge>
+                )}
+              </CardContent>
+              <CardFooter>
+                <div className="flex flex-col space-y-2 w-full">
+                  <Button 
+                    onClick={() => navigate("/admin/games")}
+                    className="w-full"
+                    variant={isAdmin ? "default" : "outline"}
+                    disabled={!can("game.edit")}
+                  >
+                    {isAdmin ? "Manage Games" : "View Games"}
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate("/admin/games/new")}
+                    className="w-full"
+                    disabled={!can("game.create")}
+                  >
+                    Create Game
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          )}
+
+          {can("session.view") && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="space-y-1">
+                  <CardTitle>Classroom Sessions</CardTitle>
+                  <CardDescription>
+                    Manage classroom sessions
+                  </CardDescription>
+                </div>
+                <BookOpen className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="text-2xl font-bold">{sessions.length}</div>
+                <p className="text-muted-foreground">Active sessions</p>
+                {unpublishedSessionAttendees > 0 && (
+                  <Badge className="bg-yellow-100 text-yellow-800 mt-2">
+                    {unpublishedSessionAttendees} unpublished assignments
+                  </Badge>
+                )}
+              </CardContent>
+              <CardFooter>
+                <div className="flex flex-col space-y-2 w-full">
+                  <Button 
+                    onClick={() => navigate("/admin/sessions")}
+                    className="w-full"
+                    variant={isAdmin ? "default" : "outline"}
+                    disabled={!can("session.edit")}
+                  >
+                    {isAdmin ? "Manage Sessions" : "View Sessions"}
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate("/admin/sessions/new")}
+                    className="w-full"
+                    disabled={!can("session.create")}
+                  >
+                    Create Session
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          )}
+
+          {can("admin.manage") && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="space-y-1">
+                  <CardTitle>Admin Management</CardTitle>
+                  <CardDescription>
+                    Manage admin accounts
+                  </CardDescription>
+                </div>
+                <UserPlus className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="text-2xl font-bold">
+                  {users.filter(u => u.isAdmin).length}
+                </div>
+                <p className="text-muted-foreground">Admin users</p>
               </CardContent>
               <CardFooter>
                 <Button 
-                  variant="outline"
-                  onClick={() => navigate("/admin/import")}
+                  onClick={() => navigate("/admin/manage-admins")}
                   className="w-full"
-                  disabled={!can("document.upload")}
+                  disabled={!can("admin.manage")}
                 >
-                  Import Data
+                  Manage Admins
                 </Button>
               </CardFooter>
             </Card>
@@ -152,14 +269,14 @@ const AdminDashboard = () => {
                 <div className="space-y-1">
                   <CardTitle>Notifications</CardTitle>
                   <CardDescription>
-                    Send updates to attendees
+                    Send updates to users
                   </CardDescription>
                 </div>
                 <Bell className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Send push notifications to meeting attendees
+                  Send notifications to camp participants
                 </p>
               </CardContent>
               <CardFooter>
@@ -181,7 +298,7 @@ const AdminDashboard = () => {
                 <div className="space-y-1">
                   <CardTitle>Invitations</CardTitle>
                   <CardDescription>
-                    Invite new attendees
+                    Invite new users
                   </CardDescription>
                 </div>
                 <Mail className="h-5 w-5 text-muted-foreground" />
@@ -199,35 +316,6 @@ const AdminDashboard = () => {
                   disabled={!can("invitation.send")}
                 >
                   Manage Invitations
-                </Button>
-              </CardFooter>
-            </Card>
-          )}
-
-          {can("branding.edit") && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div className="space-y-1">
-                  <CardTitle>Branding</CardTitle>
-                  <CardDescription>
-                    Customize app appearance
-                  </CardDescription>
-                </div>
-                <Brush className="h-5 w-5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Upload and manage branding assets
-                </p>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate("/admin/branding")}
-                  className="w-full"
-                  disabled={!can("branding.edit")}
-                >
-                  Manage Branding
                 </Button>
               </CardFooter>
             </Card>

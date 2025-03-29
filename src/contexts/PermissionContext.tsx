@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, ReactNode } from "react";
 import { useUser, UserRole } from "@/contexts/UserContext";
 
@@ -9,17 +10,25 @@ export type PermissionAction =
   | "user.edit"
   | "user.delete"
   
-  // Meeting permissions
-  | "meeting.view"
-  | "meeting.create"
-  | "meeting.edit"
-  | "meeting.delete"
-  | "meeting.manage_attendees"
+  // Location permissions
+  | "location.view"
+  | "location.create"
+  | "location.edit"
+  | "location.delete"
   
-  // Document permissions
-  | "document.view"
-  | "document.upload"
-  | "document.delete"
+  // Game permissions
+  | "game.view"
+  | "game.create"
+  | "game.edit"
+  | "game.delete"
+  | "game.manage_attendees"
+  
+  // Classroom session permissions
+  | "session.view"
+  | "session.create"
+  | "session.edit"
+  | "session.delete"
+  | "session.manage_attendees"
   
   // Notification permissions
   | "notification.send"
@@ -27,8 +36,9 @@ export type PermissionAction =
   // Invitation permissions
   | "invitation.send"
   
-  // Branding permissions
-  | "branding.edit";
+  // Admin permissions
+  | "admin.create"
+  | "admin.manage";
 
 // Define the permission context type
 interface PermissionContextType {
@@ -45,37 +55,31 @@ const rolePermissions: Record<UserRole, PermissionAction[]> = {
   admin: [
     // Admins can do everything
     "user.view", "user.create", "user.edit", "user.delete",
-    "meeting.view", "meeting.create", "meeting.edit", "meeting.delete", "meeting.manage_attendees",
-    "document.view", "document.upload", "document.delete",
+    "location.view", "location.create", "location.edit", "location.delete",
+    "game.view", "game.create", "game.edit", "game.delete", "game.manage_attendees",
+    "session.view", "session.create", "session.edit", "session.delete", "session.manage_attendees",
     "notification.send",
     "invitation.send",
-    "branding.edit"
+    "admin.create", "admin.manage"
   ],
   presenter: [
-    // Presenters can view users, view/edit their meetings, view documents
+    // Presenters can view users, manage their sessions
     "user.view",
-    "meeting.view", "meeting.edit",
-    "document.view",
-    // New: Allow presenters to view the admin dashboard
-    "user.view", "meeting.view", "document.view", "notification.send"
-  ],
-  evaluator: [
-    // Evaluators can view users, view meetings, view documents
-    "user.view",
-    "meeting.view",
-    "document.view"
+    "location.view",
+    "game.view",
+    "session.view", "session.edit",
+    "notification.send"
   ],
   observer: [
-    // Observers can view meetings, documents and now admin dashboard (read-only)
-    "meeting.view",
-    "document.view",
-    // New: Allow observers to view the admin dashboard
-    "user.view"
+    // Observers can view games, users
+    "user.view",
+    "location.view",
+    "game.view"
   ],
-  attendee: [
-    // Regular attendees can only view meetings they're part of
-    "meeting.view",
-    "document.view"
+  camper: [
+    // Regular campers can only view games and sessions they're part of
+    "game.view",
+    "session.view"
   ]
 };
 

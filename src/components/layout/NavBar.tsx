@@ -44,9 +44,16 @@ export const NavBar: React.FC = () => {
                 <Button
                   variant="ghost"
                   className="justify-start"
-                  onClick={() => navigate("/meetings")}
+                  onClick={() => navigate("/games")}
                 >
-                  Meetings
+                  Games
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => navigate("/classroom-sessions")}
+                >
+                  Classroom Sessions
                 </Button>
                 {can("user.view") && (
                   <Button
@@ -62,7 +69,7 @@ export const NavBar: React.FC = () => {
           </Sheet>
           <div className="flex items-center" onClick={() => navigate("/")}>
             <h1 className="text-xl font-bold tracking-tight cursor-pointer">
-              EventFellowship
+              TCOA Camp Management
             </h1>
           </div>
         </div>
@@ -85,9 +92,15 @@ export const NavBar: React.FC = () => {
           </Button>
           <Button
             variant="ghost"
-            onClick={() => navigate("/meetings")}
+            onClick={() => navigate("/games")}
           >
-            Meetings
+            Games
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/classroom-sessions")}
+          >
+            Classroom Sessions
           </Button>
           {can("user.view") && (
             <Button

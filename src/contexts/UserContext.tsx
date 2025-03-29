@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type UserRole = "observer" | "presenter" | "evaluator" | "attendee" | "admin";
+export type UserRole = "camper" | "observer" | "presenter" | "admin";
 
 interface User {
   id: string;
@@ -32,7 +32,7 @@ const sampleUsers: User[] = [
     name: "Admin User",
     email: "admin@example.com",
     photoUrl: "https://i.pravatar.cc/150?img=1",
-    bio: "App administrator",
+    bio: "Camp administrator",
     phone: "555-123-4567",
     role: "admin",
     isAdmin: true,
@@ -42,20 +42,20 @@ const sampleUsers: User[] = [
     name: "John Smith",
     email: "john@example.com",
     photoUrl: "https://i.pravatar.cc/150?img=2",
-    bio: "Software developer",
+    bio: "Basketball enthusiast",
     phone: "555-987-6543",
     role: "presenter",
     isAdmin: false,
-    comments: "Looking forward to the AI presentation!"
+    comments: "Excited to teach basketball fundamentals!"
   },
   {
     id: "3",
     name: "Sarah Johnson",
     email: "sarah@example.com",
     photoUrl: "https://i.pravatar.cc/150?img=3",
-    bio: "Marketing specialist",
+    bio: "First-time camper",
     phone: "555-234-5678",
-    role: "attendee",
+    role: "camper",
     isAdmin: false,
   },
 ];
