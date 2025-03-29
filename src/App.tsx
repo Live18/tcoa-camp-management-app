@@ -26,6 +26,12 @@ import LocationEdit from "./pages/admin/LocationEdit";
 import LocationDetails from "./pages/admin/LocationDetails";
 import LocationGames from "./pages/admin/LocationGames";
 import LocationSessions from "./pages/admin/LocationSessions";
+import GameManagement from "./pages/admin/GameManagement";
+import GameCreate from "./pages/admin/GameCreate";
+import GameEdit from "./pages/admin/GameEdit";
+import ClassroomSessionManagement from "./pages/admin/ClassroomSessionManagement";
+import ClassroomSessionCreate from "./pages/admin/ClassroomSessionCreate";
+import ClassroomSessionEdit from "./pages/admin/ClassroomSessionEdit";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +63,17 @@ const App = () => (
                       <Route path="/admin/locations/edit/:id" element={<LocationEdit />} />
                       <Route path="/admin/locations/:id/games" element={<LocationGames />} />
                       <Route path="/admin/locations/:id/sessions" element={<LocationSessions />} />
+                      
+                      {/* Game Management Routes */}
+                      <Route path="/admin/games" element={<GameManagement />} />
+                      <Route path="/admin/games/new" element={<GameCreate />} />
+                      <Route path="/admin/games/edit/:id" element={<GameEdit />} />
+                      
+                      {/* Classroom Session Management Routes */}
+                      <Route path="/admin/classroom-sessions" element={<ClassroomSessionManagement />} />
+                      <Route path="/admin/classroom-sessions/new" element={<ClassroomSessionCreate />} />
+                      <Route path="/admin/classroom-sessions/edit/:id" element={<ClassroomSessionEdit />} />
+                      
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Route>
