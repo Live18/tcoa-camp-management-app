@@ -56,7 +56,17 @@ const LocationCreate = () => {
   });
 
   const onSubmit = (data: FormValues) => {
-    addLocation(data);
+    // Create a location object with all required fields and optional notes
+    const newLocation = {
+      name: data.name,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      zipCode: data.zipCode,
+      notes: data.notes || undefined, // Only include notes if it's not an empty string
+    };
+    
+    addLocation(newLocation);
     toast({
       title: "Location created",
       description: `${data.name} has been created successfully.`,
