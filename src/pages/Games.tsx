@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GameController, Clock, MapPin, Users, User } from "lucide-react";
+import { Gamepad, Clock, MapPin, Users, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -176,7 +176,7 @@ const Games = () => {
           <CardContent className="py-8">
             <div className="text-center">
               <div className="mx-auto bg-gray-100 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <GameController className="h-6 w-6 text-gray-500" />
+                <Gamepad className="h-6 w-6 text-gray-500" />
               </div>
               <h3 className="font-medium text-lg">No games found</h3>
               <p className="text-muted-foreground mt-1">

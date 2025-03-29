@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, GameController, BookOpen, MapPin, Bell, Mail, UserPlus } from "lucide-react";
+import { Users, Gamepad, BookOpen, MapPin, Bell, Mail, UserPlus } from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -157,7 +156,7 @@ const AdminDashboard = () => {
                     Organize and schedule games
                   </CardDescription>
                 </div>
-                <GameController className="h-5 w-5 text-muted-foreground" />
+                <Gamepad className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent className="pb-2">
                 <div className="text-2xl font-bold">{games.length}</div>

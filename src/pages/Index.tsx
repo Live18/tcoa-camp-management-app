@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarClock, GameController, BookOpen, Clock } from "lucide-react";
+import { CalendarClock, Gamepad, BookOpen, Clock } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ const Index = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <GameController className="mr-2 h-5 w-5" />
+              <Gamepad className="mr-2 h-5 w-5" />
               Games
             </CardTitle>
             <CardDescription>

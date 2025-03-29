@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, User, GameController, BookOpen, Settings } from "lucide-react";
+import { Home, User, Gamepad, BookOpen, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermission } from "@/contexts/PermissionContext";
 
@@ -23,7 +23,7 @@ export const BottomNav: React.FC = () => {
     },
     {
       label: "Games",
-      icon: GameController,
+      icon: Gamepad,
       path: "/games",
     },
     {
