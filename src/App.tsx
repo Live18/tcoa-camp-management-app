@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import { GameProvider } from "./contexts/GameContext";
 import { ClassroomSessionProvider } from "./contexts/ClassroomSessionContext";
@@ -73,6 +73,10 @@ const App = () => (
                       <Route path="/admin/classroom-sessions" element={<ClassroomSessionManagement />} />
                       <Route path="/admin/classroom-sessions/new" element={<ClassroomSessionCreate />} />
                       <Route path="/admin/classroom-sessions/edit/:id" element={<ClassroomSessionEdit />} />
+                      
+                      {/* Redirect Routes */}
+                      <Route path="/admin/sessions" element={<Navigate to="/admin/classroom-sessions" replace />} />
+                      <Route path="/admin/sessions/*" element={<Navigate to="/admin/classroom-sessions" replace />} />
                       
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
