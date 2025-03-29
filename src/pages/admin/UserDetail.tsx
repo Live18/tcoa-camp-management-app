@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
@@ -210,16 +209,16 @@ const UserDetail = () => {
                 )}
                 
                 {/* Show admin comments only for users with admin permissions */}
-                {user.comments && (
-                  <PermissionGate action="admin.manage">
+                <PermissionGate action="admin.manage">
+                  {user.comments && (
                     <div className="space-y-2">
                       <Label>Admin Comments</Label>
                       <div className="border border-input bg-background px-3 py-2 rounded-md text-base min-h-[100px]">
                         {user.comments}
                       </div>
                     </div>
-                  </PermissionGate>
-                )}
+                  )}
+                </PermissionGate>
               </div>
             </div>
           </CardContent>
