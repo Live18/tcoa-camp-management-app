@@ -10,10 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserSwitcher } from "@/components/user/UserSwitcher";
 import { usePermission } from "@/contexts/PermissionContext";
+import { useUser } from "@/contexts/UserContext";
 
 export const NavBar: React.FC = () => {
   const navigate = useNavigate();
   const { can } = usePermission();
+  const { currentUser } = useUser();
+  
+  // Only show admin button for admin users
+  const showAdminButton = currentUser?.isAdmin;
 
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background">
@@ -55,7 +60,7 @@ export const NavBar: React.FC = () => {
                 >
                   Classroom Sessions
                 </Button>
-                {can("user.view") && (
+                {showAdminButton && (
                   <Button
                     variant="ghost"
                     className="justify-start"
@@ -102,7 +107,7 @@ export const NavBar: React.FC = () => {
           >
             Classroom Sessions
           </Button>
-          {can("user.view") && (
+          {showAdminButton && (
             <Button
               variant="ghost"
               onClick={() => navigate("/admin")}

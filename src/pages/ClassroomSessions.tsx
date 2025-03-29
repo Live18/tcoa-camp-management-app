@@ -127,12 +127,6 @@ const ClassroomSessions = () => {
                         {getLocationName(session.locationId)} - {session.roomName}
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm">
-                        {session.currentCampers} / {session.maxCampers} campers
-                      </span>
-                    </div>
                     
                     {/* Show presenters for all users */}
                     {presenters.length > 0 && (

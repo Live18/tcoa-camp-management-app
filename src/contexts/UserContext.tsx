@@ -13,6 +13,7 @@ interface User {
   role: UserRole;
   isAdmin: boolean;
   comments?: string;
+  feedback?: string; // Added feedback field for campers
 }
 
 interface UserContextType {
@@ -57,6 +58,7 @@ const sampleUsers: User[] = [
     phone: "555-234-5678",
     role: "camper",
     isAdmin: false,
+    feedback: "I'm loving this camp so far! The basketball drills are challenging but fun."
   },
 ];
 

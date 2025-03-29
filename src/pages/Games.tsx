@@ -127,12 +127,6 @@ const Games = () => {
                         {getLocationName(game.locationId)} - Court {game.courtNumber}
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm">
-                        {game.currentCampers} / {game.maxCampers} campers
-                      </span>
-                    </div>
                     
                     {/* Show observers for campers */}
                     {currentUser?.role === "camper" && observers.length > 0 && (

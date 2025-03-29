@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -29,6 +30,7 @@ const Profile = () => {
     bio: currentUser?.bio || "",
     phone: currentUser?.phone || "",
     comments: currentUser?.comments || "",
+    feedback: currentUser?.feedback || "",
     photoUrl: currentUser?.photoUrl || "",
   });
   
@@ -61,6 +63,7 @@ const Profile = () => {
       bio: currentUser?.bio || "",
       phone: currentUser?.phone || "",
       comments: currentUser?.comments || "",
+      feedback: currentUser?.feedback || "",
       photoUrl: currentUser?.photoUrl || "",
     });
     setIsEditing(true);
@@ -84,6 +87,7 @@ const Profile = () => {
         bio: formData.bio,
         phone: formData.phone,
         comments: formData.comments,
+        feedback: formData.feedback,
         photoUrl: formData.photoUrl,
       });
       
@@ -228,6 +232,24 @@ const Profile = () => {
                   />
                 </div>
                 
+                {currentUser.role === "camper" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="feedback">Feedback & Comments</Label>
+                    <Textarea 
+                      id="feedback" 
+                      name="feedback" 
+                      value={formData.feedback} 
+                      onChange={handleInputChange} 
+                      rows={4} 
+                      maxLength={10000}
+                      placeholder="Share your thoughts, feedback, or suggestions about the camp experience..."
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {formData.feedback.length}/10,000 characters
+                    </p>
+                  </div>
+                )}
+                
                 <div className="space-y-2">
                   <Label htmlFor="comments">Comments (visible to admins only)</Label>
                   <Textarea 
@@ -292,6 +314,15 @@ const Profile = () => {
                   {currentUser.bio || "No bio provided"}
                 </div>
               </div>
+              
+              {currentUser.role === "camper" && currentUser.feedback && (
+                <div className="space-y-2">
+                  <Label htmlFor="view-feedback">Feedback & Comments</Label>
+                  <div className="border border-input bg-background px-3 py-2 rounded-md text-base min-h-[100px]">
+                    {currentUser.feedback}
+                  </div>
+                </div>
+              )}
               
               {can("admin.manage") && currentUser.comments && (
                 <div className="space-y-2">

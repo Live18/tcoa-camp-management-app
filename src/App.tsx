@@ -20,6 +20,8 @@ import ClassroomSessions from "./pages/ClassroomSessions";
 import ClassroomSessionDetails from "./pages/ClassroomSessionDetails";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import UserDetail from "./pages/admin/UserDetail";
+import UserEdit from "./pages/admin/UserEdit";
 import LocationManagement from "./pages/admin/LocationManagement";
 import LocationCreate from "./pages/admin/LocationCreate";
 import LocationEdit from "./pages/admin/LocationEdit";
@@ -60,6 +62,8 @@ const App = () => (
                       <Route path="/classroom-sessions/:id" element={<ClassroomSessionDetails />} />
                       <Route path="/admin" element={<AdminDashboard />} />
                       <Route path="/admin/users" element={<UserManagement />} />
+                      <Route path="/admin/users/:id" element={<UserDetail />} />
+                      <Route path="/admin/users/edit/:id" element={<UserEdit />} />
                       <Route path="/admin/locations" element={<LocationManagement />} />
                       <Route path="/admin/locations/new" element={<LocationCreate />} />
                       <Route path="/admin/locations/:id" element={<LocationDetails />} />
