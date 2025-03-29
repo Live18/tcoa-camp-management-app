@@ -26,8 +26,8 @@ const Meetings = () => {
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
-  // For attendees, show all meetings. For others, filter based on role
-  const userMeetings = currentUser?.role === "attendee"
+  // For campers, show all meetings. For others, filter based on role
+  const userMeetings = currentUser?.role === "camper"
     ? sortedMeetings
     : currentUser?.isAdmin 
       ? sortedMeetings 
@@ -96,7 +96,7 @@ const Meetings = () => {
             const userAttendee = meeting.attendees.find(
               attendee => attendee.userId === currentUser?.id
             );
-            const userRole = userAttendee?.role || "attendee";
+            const userRole = userAttendee?.role || "camper";
             
             // Get presenters for this meeting
             const presenters = findPresenters(meeting);

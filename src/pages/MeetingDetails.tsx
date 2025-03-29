@@ -122,10 +122,10 @@ const MeetingDetails = () => {
                 </div>
               </div>
             </CardContent>
-            <PermissionGate action={["meeting.edit", "notification.send"]}>
+            <PermissionGate action={["game.edit", "notification.send"]}>
               <CardFooter>
                 <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 w-full">
-                  <PermissionGate action="meeting.edit">
+                  <PermissionGate action="game.edit">
                     <Button 
                       variant="outline" 
                       className="w-full"
@@ -179,7 +179,7 @@ const MeetingDetails = () => {
                 })}
               </div>
             </CardContent>
-            <PermissionGate action="meeting.manage_attendees">
+            <PermissionGate action="game.manage_attendees">
               <CardFooter>
                 <Button 
                   variant="outline" 

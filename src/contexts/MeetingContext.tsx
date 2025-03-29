@@ -40,7 +40,7 @@ const sampleMeetings: Meeting[] = [
     attendees: [
       { userId: "1", role: "admin" },
       { userId: "2", role: "presenter" },
-      { userId: "3", role: "attendee" },
+      { userId: "3", role: "camper" },
     ],
   },
   {
@@ -53,7 +53,7 @@ const sampleMeetings: Meeting[] = [
     currentAttendees: 8,
     attendees: [
       { userId: "1", role: "admin" },
-      { userId: "3", role: "attendee" },
+      { userId: "3", role: "camper" },
     ],
   },
 ];
