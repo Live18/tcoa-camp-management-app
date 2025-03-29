@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -15,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/use-toast";
-import { Pencil } from "lucide-react";
+import { Pencil, ArrowLeft } from "lucide-react";
 import { usePermission } from "@/contexts/PermissionContext";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { currentUser, setCurrentUser } = useUser();
@@ -119,6 +119,15 @@ const Profile = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <div className="mb-4">
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/" className="flex items-center gap-2">
+            <ArrowLeft size={16} />
+            Back to Home
+          </Link>
+        </Button>
+      </div>
+      
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
