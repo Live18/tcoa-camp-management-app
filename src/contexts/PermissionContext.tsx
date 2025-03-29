@@ -63,21 +63,19 @@ const rolePermissions: Record<UserRole, PermissionAction[]> = {
     "admin.create", "admin.manage"
   ],
   presenter: [
-    // Presenters can view users, manage their sessions
+    // Presenters can view users, view locations, view games, view sessions
     "user.view",
     "location.view",
     "game.view",
-    "session.view", "session.edit",
-    "notification.send"
+    "session.view"
   ],
   observer: [
-    // Observers can view games, users
-    "user.view",
-    "location.view",
-    "game.view"
+    // Observers have the same permissions as campers - can only view games and sessions
+    "game.view",
+    "session.view"
   ],
   camper: [
-    // Regular campers can only view games and sessions they're part of
+    // Regular campers can only view games and sessions
     "game.view",
     "session.view"
   ]
