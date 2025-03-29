@@ -75,8 +75,17 @@ const GameManagement = () => {
   return (
     <PermissionGate action="game.view">
       <div className="container mx-auto py-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Game Management</h1>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+          <div>
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate("/admin")}
+              className="mb-2 px-0"
+            >
+              ← Back to Dashboard
+            </Button>
+            <h1 className="text-3xl font-bold">Game Management</h1>
+          </div>
           
           <PermissionGate action="game.create" fallback={null}>
             <Button onClick={() => navigate("/admin/games/new")}>
