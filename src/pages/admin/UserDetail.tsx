@@ -199,7 +199,7 @@ const UserDetail = () => {
                   </div>
                 </div>
 
-                {/* Show camper feedback for admins */}
+                {/* Show camper feedback for all users who can view user profiles */}
                 {user.role === "camper" && user.feedback && (
                   <div className="space-y-2">
                     <Label>Camper Feedback</Label>
@@ -209,13 +209,16 @@ const UserDetail = () => {
                   </div>
                 )}
                 
+                {/* Show admin comments only for users with admin permissions */}
                 {user.comments && (
-                  <div className="space-y-2">
-                    <Label>Admin Comments</Label>
-                    <div className="border border-input bg-background px-3 py-2 rounded-md text-base min-h-[100px]">
-                      {user.comments}
+                  <PermissionGate action="admin.manage">
+                    <div className="space-y-2">
+                      <Label>Admin Comments</Label>
+                      <div className="border border-input bg-background px-3 py-2 rounded-md text-base min-h-[100px]">
+                        {user.comments}
+                      </div>
                     </div>
-                  </div>
+                  </PermissionGate>
                 )}
               </div>
             </div>

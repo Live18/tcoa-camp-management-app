@@ -260,6 +260,9 @@ const Profile = () => {
                     rows={4} 
                     placeholder="Share any comments or questions with the event administrators..."
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Note: These comments are only visible to administrators.
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -324,6 +327,7 @@ const Profile = () => {
                 </div>
               )}
               
+              {/* Show comments section only for admins */}
               {can("admin.manage") && currentUser.comments && (
                 <div className="space-y-2">
                   <Label htmlFor="view-comments">Comments (visible to admins only)</Label>
