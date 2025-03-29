@@ -21,6 +21,11 @@ import ClassroomSessionDetails from "./pages/ClassroomSessionDetails";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import LocationManagement from "./pages/admin/LocationManagement";
+import LocationCreate from "./pages/admin/LocationCreate";
+import LocationEdit from "./pages/admin/LocationEdit";
+import LocationDetails from "./pages/admin/LocationDetails";
+import LocationGames from "./pages/admin/LocationGames";
+import LocationSessions from "./pages/admin/LocationSessions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +52,11 @@ const App = () => (
                       <Route path="/admin" element={<AdminDashboard />} />
                       <Route path="/admin/users" element={<UserManagement />} />
                       <Route path="/admin/locations" element={<LocationManagement />} />
+                      <Route path="/admin/locations/new" element={<LocationCreate />} />
+                      <Route path="/admin/locations/:id" element={<LocationDetails />} />
+                      <Route path="/admin/locations/edit/:id" element={<LocationEdit />} />
+                      <Route path="/admin/locations/:id/games" element={<LocationGames />} />
+                      <Route path="/admin/locations/:id/sessions" element={<LocationSessions />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Route>
