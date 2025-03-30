@@ -31,9 +31,11 @@ import LocationSessions from "./pages/admin/LocationSessions";
 import GameManagement from "./pages/admin/GameManagement";
 import GameCreate from "./pages/admin/GameCreate";
 import GameEdit from "./pages/admin/GameEdit";
+import GameDetail from "./pages/admin/GameDetail";
 import ClassroomSessionManagement from "./pages/admin/ClassroomSessionManagement";
 import ClassroomSessionCreate from "./pages/admin/ClassroomSessionCreate";
 import ClassroomSessionEdit from "./pages/admin/ClassroomSessionEdit";
+import SessionDetail from "./pages/admin/SessionDetail";
 import AdminManagement from "./pages/admin/AdminManagement";
 import AdminCreate from "./pages/admin/AdminCreate";
 import AdminEdit from "./pages/admin/AdminEdit";
@@ -75,11 +77,13 @@ const App = () => (
                       <Route path="/admin/games" element={<GameManagement />} />
                       <Route path="/admin/games/new" element={<GameCreate />} />
                       <Route path="/admin/games/edit/:id" element={<GameEdit />} />
+                      <Route path="/admin/games/:id" element={<GameDetail />} />
                       
                       {/* Classroom Session Management Routes */}
                       <Route path="/admin/classroom-sessions" element={<ClassroomSessionManagement />} />
                       <Route path="/admin/classroom-sessions/new" element={<ClassroomSessionCreate />} />
                       <Route path="/admin/classroom-sessions/edit/:id" element={<ClassroomSessionEdit />} />
+                      <Route path="/admin/sessions/:id" element={<SessionDetail />} />
                       
                       {/* Admin Management Routes */}
                       <Route path="/admin/manage-admins" element={<AdminManagement />} />
