@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Calendar, MapPin, Clock, BookOpen } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, Calendar, MapPin, Clock, BookOpen, UserPlus } from "lucide-react";
 
 const SessionDetail = () => {
   const navigate = useNavigate();
@@ -186,14 +187,21 @@ const SessionDetail = () => {
           </Card>
           
           <PermissionGate action="session.edit">
-            <AttendeeManager 
-              attendees={session.attendees}
-              onAddAttendee={handleAddAttendee}
-              onRemoveAttendee={handleRemoveAttendee}
-              onPublishAttendees={handlePublishAttendees}
-              allowedRoles={["camper", "presenter"]}
-              maxAttendees={session.maxCampers}
-            />
+            <div className="mt-2">
+              <div className="flex items-center mb-4">
+                <UserPlus className="h-5 w-5 mr-2 text-primary" />
+                <h2 className="text-xl font-bold">Manage Attendees</h2>
+              </div>
+              <Separator className="mb-6" />
+              <AttendeeManager 
+                attendees={session.attendees}
+                onAddAttendee={handleAddAttendee}
+                onRemoveAttendee={handleRemoveAttendee}
+                onPublishAttendees={handlePublishAttendees}
+                allowedRoles={["camper", "presenter"]}
+                maxAttendees={session.maxCampers}
+              />
+            </div>
           </PermissionGate>
         </div>
       </div>

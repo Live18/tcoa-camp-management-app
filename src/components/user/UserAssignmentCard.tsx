@@ -19,7 +19,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { Calendar, MapPin, Gamepad, BookOpen } from "lucide-react";
+import { Calendar, MapPin, Gamepad, BookOpen, Eye } from "lucide-react";
 
 interface Attendee {
   userId: string;
@@ -131,7 +131,7 @@ export const UserAssignmentCard: React.FC<UserAssignmentCardProps> = ({
                           className="w-full"
                           onClick={() => navigate(`/admin/games/${game.id}`)}
                         >
-                          <Gamepad className="mr-2 h-4 w-4" /> Manage Game
+                          <Eye className="mr-2 h-4 w-4" /> View Game
                         </Button>
                       </CardFooter>
                     </Card>
@@ -191,7 +191,7 @@ export const UserAssignmentCard: React.FC<UserAssignmentCardProps> = ({
                           className="w-full"
                           onClick={() => navigate(`/admin/sessions/${session.id}`)}
                         >
-                          <BookOpen className="mr-2 h-4 w-4" /> Manage Session
+                          <Eye className="mr-2 h-4 w-4" /> View Session
                         </Button>
                       </CardFooter>
                     </Card>

@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Calendar, MapPin, Clock } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, Calendar, MapPin, Clock, UserPlus } from "lucide-react";
 
 const GameDetail = () => {
   const navigate = useNavigate();
@@ -183,14 +184,21 @@ const GameDetail = () => {
           </Card>
           
           <PermissionGate action="game.edit">
-            <AttendeeManager 
-              attendees={game.attendees}
-              onAddAttendee={handleAddAttendee}
-              onRemoveAttendee={handleRemoveAttendee}
-              onPublishAttendees={handlePublishAttendees}
-              allowedRoles={["camper", "observer"]}
-              maxAttendees={game.maxCampers}
-            />
+            <div className="mt-2">
+              <div className="flex items-center mb-4">
+                <UserPlus className="h-5 w-5 mr-2 text-primary" />
+                <h2 className="text-xl font-bold">Manage Attendees</h2>
+              </div>
+              <Separator className="mb-6" />
+              <AttendeeManager 
+                attendees={game.attendees}
+                onAddAttendee={handleAddAttendee}
+                onRemoveAttendee={handleRemoveAttendee}
+                onPublishAttendees={handlePublishAttendees}
+                allowedRoles={["camper", "observer"]}
+                maxAttendees={game.maxCampers}
+              />
+            </div>
           </PermissionGate>
         </div>
       </div>
