@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { UserRole } from "@/contexts/UserContext";
+import { Game as GameType } from "@/contexts/GameContext";
 import {
   Card,
   CardContent,
@@ -26,14 +27,7 @@ interface Attendee {
   published: boolean;
 }
 
-interface Game {
-  id: string;
-  title: string;
-  date: string;
-  courtNumber: string;
-  attendees: Attendee[];
-}
-
+// Use the type from context instead of redefining it
 interface Session {
   id: string;
   title: string;
@@ -44,7 +38,7 @@ interface Session {
 
 interface UserAssignmentCardProps {
   userId: string;
-  assignedGames: Game[];
+  assignedGames: GameType[];
   assignedSessions: Session[];
 }
 
