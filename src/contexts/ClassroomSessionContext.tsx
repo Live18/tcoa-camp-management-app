@@ -4,7 +4,7 @@ import { UserRole } from "./UserContext";
 
 export interface SessionAttendee {
   userId: string;
-  role: UserRole; // camper or presenter
+  role: UserRole | "presenter"; // camper, observer, or presenter
   published: boolean; // track if assignment has been published
 }
 
@@ -14,7 +14,7 @@ export interface ClassroomSession {
   description: string;
   date: string;
   locationId: string;
-  roomName: string;
+  roomNumber: number;
   maxCampers: number;
   currentCampers: number;
   attendees: SessionAttendee[];
@@ -38,32 +38,35 @@ const ClassroomSessionContext = createContext<ClassroomSessionContextType | unde
 const sampleSessions: ClassroomSession[] = [
   {
     id: "1",
-    title: "Basketball Strategy",
-    description: "Learn advanced basketball strategies",
-    date: "2023-07-16T09:00:00Z",
+    title: "Basketball Strategy 101",
+    description: "Learn the fundamentals of basketball strategy",
+    date: "2023-08-10T14:00:00Z",
     locationId: "1",
-    roomName: "Lecture Hall A",
-    maxCampers: 30,
-    currentCampers: 15,
+    roomNumber: 101,
+    maxCampers: 15,
+    currentCampers: 6,
     attendees: [
       { userId: "1", role: "admin", published: true },
-      { userId: "2", role: "presenter", published: true },
       { userId: "3", role: "camper", published: true },
+      { userId: "4", role: "camper", published: false },
+      { userId: "5", role: "camper", published: true },
+      { userId: "6", role: "presenter", published: true },
+      { userId: "7", role: "camper", published: false },
     ],
   },
   {
     id: "2",
-    title: "Nutrition for Athletes",
-    description: "Proper nutrition for optimal performance",
-    date: "2023-07-21T13:00:00Z",
+    title: "Defensive Techniques",
+    description: "Mastering defensive moves and positions",
+    date: "2023-08-15T10:30:00Z",
     locationId: "2",
-    roomName: "Conference Room B",
-    maxCampers: 20,
-    currentCampers: 8,
+    roomNumber: 102,
+    maxCampers: 12,
+    currentCampers: 3,
     attendees: [
       { userId: "1", role: "admin", published: true },
-      { userId: "2", role: "presenter", published: true },
-      { userId: "3", role: "camper", published: false },
+      { userId: "2", role: "observer", published: false },
+      { userId: "5", role: "camper", published: true },
     ],
   },
 ];

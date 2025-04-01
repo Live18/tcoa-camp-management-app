@@ -39,6 +39,7 @@ import SessionDetail from "./pages/admin/SessionDetail";
 import AdminManagement from "./pages/admin/AdminManagement";
 import AdminCreate from "./pages/admin/AdminCreate";
 import AdminEdit from "./pages/admin/AdminEdit";
+import Assignments from "./pages/admin/Assignments";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -89,6 +90,9 @@ const App = () => (
                       <Route path="/admin/manage-admins" element={<AdminManagement />} />
                       <Route path="/admin/manage-admins/new" element={<AdminCreate />} />
                       <Route path="/admin/manage-admins/edit/:id" element={<AdminEdit />} />
+
+                      {/* Assignments Management Route */}
+                      <Route path="/admin/assignments" element={<Assignments />} />
                       
                       {/* Redirect Routes */}
                       <Route path="/admin/sessions" element={<Navigate to="/admin/classroom-sessions" replace />} />
