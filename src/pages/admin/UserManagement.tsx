@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
@@ -129,7 +128,7 @@ const UserManagement = () => {
                             size="sm"
                             onClick={() => navigate(`/admin/users/${user.id}`)}
                           >
-                            View
+                            View User
                           </Button>
                         </PermissionGate>
                         <PermissionGate action="user.edit">

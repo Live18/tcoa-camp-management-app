@@ -118,8 +118,16 @@ const GameManagement = () => {
                   {games.map((game) => {
                     const location = getLocation(game.locationId);
                     return (
-                      <TableRow key={game.id}>
-                        <TableCell className="font-medium">{game.title}</TableCell>
+                      <TableRow key={game.id} className="group">
+                        <TableCell className="font-medium">
+                          <Button 
+                            variant="link" 
+                            className="p-0 h-auto font-medium text-foreground hover:text-primary justify-start"
+                            onClick={() => navigate(`/admin/games/${game.id}`)}
+                          >
+                            {game.title}
+                          </Button>
+                        </TableCell>
                         <TableCell>
                           {location ? location.name : "Unknown"} - Court {game.courtNumber}
                         </TableCell>
@@ -138,8 +146,8 @@ const GameManagement = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => navigate(`/games/${game.id}`)}>
-                                <Eye className="h-4 w-4 mr-2" /> View
+                              <DropdownMenuItem onClick={() => navigate(`/admin/games/${game.id}`)}>
+                                <Eye className="h-4 w-4 mr-2" /> View Game
                               </DropdownMenuItem>
                               <PermissionGate action="game.edit" fallback={null}>
                                 <DropdownMenuItem onClick={() => navigate(`/admin/games/edit/${game.id}`)}>
