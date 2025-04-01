@@ -70,29 +70,6 @@ const AdminDashboard = () => {
           </Card>
         )}
 
-        {can("admin.manage") && (
-          <Card className="mb-6 border-red-200 bg-red-50">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-red-800">Camp Administration</h3>
-                  <p className="text-sm text-red-700">
-                    End the current camp and prepare for a new one
-                  </p>
-                </div>
-                <Button 
-                  variant="destructive" 
-                  className="gap-2"
-                  onClick={() => navigate("/admin/end-camp")}
-                >
-                  <PowerOff className="h-4 w-4" />
-                  End Camp
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {can("user.view") && (
             <Card>
@@ -343,6 +320,30 @@ const AdminDashboard = () => {
             </Card>
           )}
         </div>
+
+        {/* End Camp Section - Moved to the bottom of the page */}
+        {can("admin.manage") && (
+          <Card className="mt-12 border-red-200 bg-red-50">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-red-800">Camp Administration</h3>
+                  <p className="text-sm text-red-700">
+                    End the current camp and prepare for a new one
+                  </p>
+                </div>
+                <Button 
+                  variant="destructive" 
+                  className="gap-2"
+                  onClick={() => navigate("/admin/end-camp")}
+                >
+                  <PowerOff className="h-4 w-4" />
+                  End Camp
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </PermissionGate>
   );
