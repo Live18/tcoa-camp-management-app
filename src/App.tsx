@@ -10,7 +10,7 @@ import { ClassroomSessionProvider } from "./contexts/ClassroomSessionContext";
 import { LocationProvider } from "./contexts/LocationContext";
 import { PermissionProvider } from "./contexts/PermissionContext";
 import { MobileLayout } from "./components/layout/MobileLayout";
-import { EndCampRoute } from "./components/EndCampRoute";
+import EndCamp from "./pages/admin/EndCamp";
 
 // Pages
 import Index from "./pages/Index";
@@ -96,7 +96,7 @@ const App = () => (
                       <Route path="/admin/assignments" element={<Assignments />} />
                       
                       {/* End Camp Route */}
-                      <EndCampRoute />
+                      <Route path="/admin/end-camp" element={<EndCamp />} />
                       
                       {/* Redirect Routes */}
                       <Route path="/admin/sessions" element={<Navigate to="/admin/classroom-sessions" replace />} />
