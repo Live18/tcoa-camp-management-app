@@ -14,7 +14,7 @@ export interface ClassroomSession {
   description: string;
   date: string;
   locationId: string;
-  roomNumber: number;
+  roomName: string; // Changed from roomNumber to roomName for consistency
   maxCampers: number;
   currentCampers: number;
   attendees: SessionAttendee[];
@@ -42,7 +42,7 @@ const sampleSessions: ClassroomSession[] = [
     description: "Learn the fundamentals of basketball strategy",
     date: "2023-08-10T14:00:00Z",
     locationId: "1",
-    roomNumber: 101,
+    roomName: "101", // Changed from roomNumber to roomName
     maxCampers: 15,
     currentCampers: 6,
     attendees: [
@@ -60,7 +60,7 @@ const sampleSessions: ClassroomSession[] = [
     description: "Mastering defensive moves and positions",
     date: "2023-08-15T10:30:00Z",
     locationId: "2",
-    roomNumber: 102,
+    roomName: "102", // Changed from roomNumber to roomName
     maxCampers: 12,
     currentCampers: 3,
     attendees: [

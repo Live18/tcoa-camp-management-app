@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
 import { useGame } from "@/contexts/GameContext";
-import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
+import { useClassroomSession, ClassroomSession } from "@/contexts/ClassroomSessionContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -27,8 +27,8 @@ const UserDetail = () => {
     game.attendees.some(attendee => attendee.userId === id)
   );
 
-  // Get sessions assigned to this user
-  const assignedSessions = sessions.filter(session => 
+  // Get sessions assigned to this user (now typed correctly)
+  const assignedSessions: ClassroomSession[] = sessions.filter(session => 
     session.attendees.some(attendee => attendee.userId === id)
   );
 

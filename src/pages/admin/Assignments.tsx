@@ -38,7 +38,8 @@ import {
   ArrowLeft, 
   Calendar,
   MapPin,
-  User
+  User,
+  Clock, // Added missing Clock import
 } from "lucide-react";
 
 import { 
