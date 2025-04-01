@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { UserProfileCard } from "@/components/user/UserProfileCard";
 import { UserAssignmentCard } from "@/components/user/UserAssignmentCard";
+import { UserCommentsCard } from "@/components/user/UserCommentsCard";
 import { UserNotFound } from "@/components/user/UserNotFound";
 
 const UserDetail = () => {
@@ -73,6 +74,9 @@ const UserDetail = () => {
           assignedGames={assignedGames} 
           assignedSessions={assignedSessions} 
         />
+        
+        {/* Add the new UserCommentsCard component */}
+        <UserCommentsCard userId={id || ''} />
       </div>
     </PermissionGate>
   );
