@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Gamepad, BookOpen, MapPin, Bell, Mail, UserPlus } from "lucide-react";
+import { Users, Gamepad, BookOpen, MapPin, Bell, Mail, UserPlus, PowerOff } from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -64,6 +64,29 @@ const AdminDashboard = () => {
                   onClick={() => navigate("/admin/assignments")}
                 >
                   Review Assignments
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {can("admin.manage") && (
+          <Card className="mb-6 border-red-200 bg-red-50">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-red-800">Camp Administration</h3>
+                  <p className="text-sm text-red-700">
+                    End the current camp and prepare for a new one
+                  </p>
+                </div>
+                <Button 
+                  variant="destructive" 
+                  className="gap-2"
+                  onClick={() => navigate("/admin/end-camp")}
+                >
+                  <PowerOff className="h-4 w-4" />
+                  End Camp
                 </Button>
               </div>
             </CardContent>

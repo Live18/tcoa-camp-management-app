@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, ReactNode } from "react";
 import { useUser, UserRole } from "@/contexts/UserContext";
 
@@ -38,7 +37,8 @@ export type PermissionAction =
   
   // Admin permissions
   | "admin.create"
-  | "admin.manage";
+  | "admin.manage"
+  | "admin.end_camp"; // Added permission for ending camp
 
 // Define the permission context type
 interface PermissionContextType {
@@ -60,7 +60,7 @@ const rolePermissions: Record<UserRole, PermissionAction[]> = {
     "session.view", "session.create", "session.edit", "session.delete", "session.manage_attendees",
     "notification.send",
     "invitation.send",
-    "admin.create", "admin.manage"
+    "admin.create", "admin.manage", "admin.end_camp"
   ],
   presenter: [
     // Presenters can view users, view locations, view games, view sessions

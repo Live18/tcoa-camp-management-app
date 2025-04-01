@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export interface Location {
@@ -22,6 +21,7 @@ interface LocationContextType {
   updateLocation: (id: string, locationData: Partial<Location>) => void;
   deleteLocation: (id: string) => void;
   getLocation: (id: string) => Location | undefined;
+  resetAllLocations: () => void; // Added method for end camp functionality
 }
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
@@ -83,6 +83,11 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
     return locations.find((location) => location.id === id);
   };
 
+  // Add a method to reset all locations
+  const resetAllLocations = () => {
+    setLocations([]);
+  };
+
   return (
     <LocationContext.Provider
       value={{
@@ -92,6 +97,7 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
         updateLocation,
         deleteLocation,
         getLocation,
+        resetAllLocations,
       }}
     >
       {children}

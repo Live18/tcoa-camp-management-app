@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { UserRole } from "./UserContext";
 
@@ -30,6 +29,7 @@ interface GameContextType {
   getGamesByLocationId: (locationId: string) => Game[];
   getUnpublishedAttendees: () => number;
   publishAttendees: (gameId: string, attendeeIds: string[]) => void;
+  resetAllGames: () => void; // Added method for end camp functionality
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -123,6 +123,11 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
+  // Add a method to reset all games
+  const resetAllGames = () => {
+    setGames([]);
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -135,6 +140,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         getGamesByLocationId,
         getUnpublishedAttendees,
         publishAttendees,
+        resetAllGames,
       }}
     >
       {children}

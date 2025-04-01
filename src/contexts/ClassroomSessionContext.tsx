@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { UserRole } from "./UserContext";
 
@@ -30,6 +29,7 @@ interface ClassroomSessionContextType {
   getSessionsByLocationId: (locationId: string) => ClassroomSession[];
   getUnpublishedAttendees: () => number;
   publishAttendees: (sessionId: string, attendeeIds: string[]) => void;
+  resetAllSessions: () => void; // Added method for end camp functionality
 }
 
 const ClassroomSessionContext = createContext<ClassroomSessionContextType | undefined>(undefined);
@@ -127,6 +127,11 @@ export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ ch
     );
   };
 
+  // Add a method to reset all sessions
+  const resetAllSessions = () => {
+    setSessions([]);
+  };
+
   return (
     <ClassroomSessionContext.Provider
       value={{
@@ -139,6 +144,7 @@ export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ ch
         getSessionsByLocationId,
         getUnpublishedAttendees,
         publishAttendees,
+        resetAllSessions,
       }}
     >
       {children}
