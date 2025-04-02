@@ -18,7 +18,13 @@ import { toast } from "@/components/ui/use-toast";
 import { Pencil, ArrowLeft, Mail, Phone, Bell } from "lucide-react";
 import { usePermission } from "@/contexts/PermissionContext";
 import { Link } from "react-router-dom";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Profile = () => {
   const { currentUser, setCurrentUser } = useUser();
@@ -46,10 +52,10 @@ const Profile = () => {
     }));
   };
 
-  const handleNotificationChange = (value: NotificationPreference) => {
+  const handleNotificationChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
-      notificationPreference: value
+      notificationPreference: value === "none" ? null : value as NotificationPreference
     }));
   };
 
@@ -130,6 +136,20 @@ const Profile = () => {
       .map(part => part[0])
       .join("")
       .toUpperCase();
+  };
+
+  // Helper to get notification icon and color
+  const getNotificationIcon = (preference: NotificationPreference | null) => {
+    if (preference === "email") return <Mail className="h-4 w-4 text-blue-600" />;
+    if (preference === "sms") return <Phone className="h-4 w-4 text-green-600" />;
+    return <Bell className="h-4 w-4 text-gray-400" />;
+  };
+
+  // Helper to get notification text
+  const getNotificationText = (preference: NotificationPreference | null) => {
+    if (preference === "email") return "Email notifications";
+    if (preference === "sms") return "SMS notifications";
+    return "No notifications";
   };
 
   return (
@@ -233,39 +253,38 @@ const Profile = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Notification Preferences</Label>
-                  <div className="border border-input rounded-md p-4 bg-background">
-                    <RadioGroup 
-                      value={formData.notificationPreference === null ? "" : formData.notificationPreference} 
-                      onValueChange={(value) => handleNotificationChange(value === "" ? null : value as NotificationPreference)}
-                      className="flex flex-col space-y-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="email" id="notification-email" />
-                        <Label htmlFor="notification-email" className="cursor-pointer flex items-center">
-                          <Mail size={16} className="mr-2 text-blue-600" />
-                          Email notifications
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="sms" id="notification-sms" />
-                        <Label htmlFor="notification-sms" className="cursor-pointer flex items-center">
-                          <Phone size={16} className="mr-2 text-green-600" />
-                          SMS notifications
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="" id="notification-none" />
-                        <Label htmlFor="notification-none" className="cursor-pointer flex items-center">
-                          <Bell size={16} className="mr-2 text-gray-400" />
-                          No notifications
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Choose how you'd like to receive updates about assignments and camp activities.
-                    </p>
-                  </div>
+                  <Label htmlFor="notification-preference">Notification Preferences</Label>
+                  <Select
+                    value={formData.notificationPreference === null ? "none" : formData.notificationPreference}
+                    onValueChange={handleNotificationChange}
+                  >
+                    <SelectTrigger id="notification-preference" className="w-full">
+                      <SelectValue placeholder="Select notification preference" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="email" className="flex items-center">
+                        <div className="flex items-center gap-2">
+                          <Mail size={16} className="text-blue-600" />
+                          <span>Email notifications</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="sms" className="flex items-center">
+                        <div className="flex items-center gap-2">
+                          <Phone size={16} className="text-green-600" />
+                          <span>SMS notifications</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="none" className="flex items-center">
+                        <div className="flex items-center gap-2">
+                          <Bell size={16} className="text-gray-400" />
+                          <span>No notifications</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Choose how you'd like to receive updates about assignments and camp activities.
+                  </p>
                 </div>
                 
                 <div className="space-y-2">
@@ -361,24 +380,12 @@ const Profile = () => {
               <div className="space-y-2">
                 <Label htmlFor="view-notifications">Notification Preferences</Label>
                 <div className="border border-input bg-background px-3 py-2 rounded-md text-base">
-                  {currentUser.notificationPreference === "email" && (
-                    <div className="flex items-center">
-                      <Mail size={16} className="mr-2 text-blue-600" />
-                      Email notifications
-                    </div>
-                  )}
-                  {currentUser.notificationPreference === "sms" && (
-                    <div className="flex items-center">
-                      <Phone size={16} className="mr-2 text-green-600" />
-                      SMS notifications
-                    </div>
-                  )}
-                  {!currentUser.notificationPreference && (
-                    <div className="flex items-center">
-                      <Bell size={16} className="mr-2 text-gray-400" />
-                      No notifications selected
-                    </div>
-                  )}
+                  <div className="flex items-center">
+                    {getNotificationIcon(currentUser.notificationPreference)}
+                    <span className="ml-2">
+                      {getNotificationText(currentUser.notificationPreference)}
+                    </span>
+                  </div>
                 </div>
               </div>
               
