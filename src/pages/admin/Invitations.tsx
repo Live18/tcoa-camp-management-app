@@ -40,7 +40,7 @@ const Invitations = () => {
     {
       id: "1",
       email: "coach@example.com",
-      role: "presenter",
+      role: "presenter-observer",
       message: "Please join us as a basketball coach!",
       status: "pending",
       sentAt: new Date(Date.now() - 3600000 * 24) // 1 day ago
@@ -48,7 +48,7 @@ const Invitations = () => {
     {
       id: "2",
       email: "parent@example.com",
-      role: "observer",
+      role: "presenter-observer",
       message: "You're invited to observe your child's camp activities",
       status: "accepted",
       sentAt: new Date(Date.now() - 3600000 * 72) // 3 days ago
@@ -78,6 +78,14 @@ const Invitations = () => {
       case "expired":
         return <Badge variant="outline" className="bg-gray-50 text-gray-800 border-gray-300">Expired</Badge>;
     }
+  };
+  
+  // Format role display for the table
+  const formatRoleDisplay = (role: string) => {
+    if (role === "presenter-observer") {
+      return "Presenter/Observer";
+    }
+    return role.charAt(0).toUpperCase() + role.slice(1);
   };
   
   // Handle sending a new invitation
@@ -233,8 +241,7 @@ const Invitations = () => {
                     onChange={(e) => setRole(e.target.value)}
                   >
                     <option value="camper">Camper</option>
-                    <option value="presenter">Presenter</option>
-                    <option value="observer">Observer</option>
+                    <option value="presenter-observer">Presenter/Observer</option>
                   </select>
                 </div>
               </div>
@@ -281,7 +288,7 @@ const Invitations = () => {
                   {invitations.map((invitation) => (
                     <TableRow key={invitation.id}>
                       <TableCell>{invitation.email}</TableCell>
-                      <TableCell className="capitalize">{invitation.role}</TableCell>
+                      <TableCell className="capitalize">{formatRoleDisplay(invitation.role)}</TableCell>
                       <TableCell>
                         {invitation.sentAt.toLocaleDateString()} at {invitation.sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </TableCell>

@@ -40,12 +40,17 @@ export const generateInvitationEmail = (
   const appBaseUrl = window.location.origin;
   const inviteLink = `${appBaseUrl}/register?email=${encodeURIComponent(email)}&role=${role}`;
   
-  const subject = `You're invited to join the Basketball Camp as a ${role}`;
+  // Format role for display in the email
+  const displayRole = role === "presenter-observer" 
+    ? "Presenter and Observer" 
+    : role.charAt(0).toUpperCase() + role.slice(1);
+  
+  const subject = `You're invited to join the Basketball Camp as a ${displayRole}`;
   
   const body = `
 Hello,
 
-You've been invited to join our Basketball Camp platform as a ${role}.
+You've been invited to join our Basketball Camp platform as a ${displayRole}.
 
 ${customMessage ? `\n${customMessage}\n\n` : ''}
 
