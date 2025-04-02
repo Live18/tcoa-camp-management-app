@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
 import { ArrowLeft, Mail, Send, RefreshCw, X } from "lucide-react";
+import { sendGmailEmail, generateInvitationEmail } from "@/utils/emailService";
 
 // Invitation status types
 type InvitationStatus = "pending" | "accepted" | "expired";
@@ -102,32 +103,77 @@ const Invitations = () => {
       sentAt: new Date()
     };
     
-    // Add to invitations list
-    setInvitations([newInvitation, ...invitations]);
+    // Generate email content
+    const { subject, body } = generateInvitationEmail(email, role, message);
     
-    // Show success message
-    toast({
-      title: "Invitation Sent",
-      description: `An invitation has been sent to ${email}`,
+    // Send email via Gmail
+    const emailSent = sendGmailEmail({
+      to: email,
+      subject,
+      body
     });
     
-    // Reset form
-    setEmail("");
-    setMessage("");
+    if (emailSent) {
+      // Add to invitations list
+      setInvitations([newInvitation, ...invitations]);
+      
+      // Show success message
+      toast({
+        title: "Invitation Sent",
+        description: `An invitation has been sent to ${email}`,
+      });
+      
+      // Reset form
+      setEmail("");
+      setMessage("");
+    } else {
+      toast({
+        title: "Email Error",
+        description: "Failed to open email client. Please check your configuration.",
+        variant: "destructive"
+      });
+    }
   };
   
   // Handle resending an invitation
   const handleResendInvitation = (id: string) => {
-    setInvitations(invitations.map(inv => 
-      inv.id === id 
-        ? { ...inv, sentAt: new Date(), status: "pending" } 
-        : inv
-    ));
+    const invitation = invitations.find(inv => inv.id === id);
     
-    toast({
-      title: "Invitation Resent",
-      description: "The invitation has been resent",
-    });
+    if (invitation) {
+      // Generate email content for resend
+      const { subject, body } = generateInvitationEmail(
+        invitation.email, 
+        invitation.role, 
+        invitation.message
+      );
+      
+      // Send email via Gmail
+      const emailSent = sendGmailEmail({
+        to: invitation.email,
+        subject,
+        body
+      });
+      
+      if (emailSent) {
+        // Update invitation status
+        setInvitations(invitations.map(inv => 
+          inv.id === id 
+            ? { ...inv, sentAt: new Date(), status: "pending" } 
+            : inv
+        ));
+        
+        toast({
+          title: "Invitation Resent",
+          description: "The invitation has been resent",
+        });
+      } else {
+        toast({
+          title: "Email Error",
+          description: "Failed to open email client. Please check your configuration.",
+          variant: "destructive"
+        });
+      }
+    }
   };
   
   // Handle canceling an invitation
