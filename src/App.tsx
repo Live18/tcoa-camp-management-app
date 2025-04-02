@@ -41,6 +41,7 @@ import AdminManagement from "./pages/admin/AdminManagement";
 import AdminCreate from "./pages/admin/AdminCreate";
 import AdminEdit from "./pages/admin/AdminEdit";
 import Assignments from "./pages/admin/Assignments";
+import Invitations from "./pages/admin/Invitations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -94,6 +95,9 @@ const App = () => (
 
                       {/* Assignments Management Route */}
                       <Route path="/admin/assignments" element={<Assignments />} />
+                      
+                      {/* Invitations Management Route */}
+                      <Route path="/admin/invitations" element={<Invitations />} />
                       
                       {/* End Camp Route */}
                       <Route path="/admin/end-camp" element={<EndCamp />} />
