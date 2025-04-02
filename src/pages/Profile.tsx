@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/use-toast";
-import { Pencil, ArrowLeft } from "lucide-react";
+import { Pencil, ArrowLeft, Mail, Phone, Bell } from "lucide-react";
 import { usePermission } from "@/contexts/PermissionContext";
 import { Link } from "react-router-dom";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -236,21 +236,30 @@ const Profile = () => {
                   <Label>Notification Preferences</Label>
                   <div className="border border-input rounded-md p-4 bg-background">
                     <RadioGroup 
-                      value={formData.notificationPreference || ""} 
-                      onValueChange={(value) => handleNotificationChange(value as NotificationPreference)}
+                      value={formData.notificationPreference === null ? "" : formData.notificationPreference} 
+                      onValueChange={(value) => handleNotificationChange(value === "" ? null : value as NotificationPreference)}
                       className="flex flex-col space-y-2"
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="email" id="notification-email" />
-                        <Label htmlFor="notification-email" className="cursor-pointer">Email notifications</Label>
+                        <Label htmlFor="notification-email" className="cursor-pointer flex items-center">
+                          <Mail size={16} className="mr-2 text-blue-600" />
+                          Email notifications
+                        </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="sms" id="notification-sms" />
-                        <Label htmlFor="notification-sms" className="cursor-pointer">SMS notifications</Label>
+                        <Label htmlFor="notification-sms" className="cursor-pointer flex items-center">
+                          <Phone size={16} className="mr-2 text-green-600" />
+                          SMS notifications
+                        </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="" id="notification-none" />
-                        <Label htmlFor="notification-none" className="cursor-pointer">No notifications</Label>
+                        <Label htmlFor="notification-none" className="cursor-pointer flex items-center">
+                          <Bell size={16} className="mr-2 text-gray-400" />
+                          No notifications
+                        </Label>
                       </div>
                     </RadioGroup>
                     <p className="text-xs text-muted-foreground mt-2">
@@ -352,9 +361,24 @@ const Profile = () => {
               <div className="space-y-2">
                 <Label htmlFor="view-notifications">Notification Preferences</Label>
                 <div className="border border-input bg-background px-3 py-2 rounded-md text-base">
-                  {currentUser.notificationPreference === "email" && "Email notifications"}
-                  {currentUser.notificationPreference === "sms" && "SMS notifications"}
-                  {!currentUser.notificationPreference && "No notifications selected"}
+                  {currentUser.notificationPreference === "email" && (
+                    <div className="flex items-center">
+                      <Mail size={16} className="mr-2 text-blue-600" />
+                      Email notifications
+                    </div>
+                  )}
+                  {currentUser.notificationPreference === "sms" && (
+                    <div className="flex items-center">
+                      <Phone size={16} className="mr-2 text-green-600" />
+                      SMS notifications
+                    </div>
+                  )}
+                  {!currentUser.notificationPreference && (
+                    <div className="flex items-center">
+                      <Bell size={16} className="mr-2 text-gray-400" />
+                      No notifications selected
+                    </div>
+                  )}
                 </div>
               </div>
               
