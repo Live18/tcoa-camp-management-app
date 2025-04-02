@@ -1,11 +1,12 @@
 
-import React, { ReactNode } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
-import { useUser, UserRole } from "@/contexts/UserContext";
+import { useUser } from "@/contexts/UserContext";
+import { MobileLayout } from "@/components/layout/MobileLayout";
 
 interface AuthGuardProps {
-  children: ReactNode;
-  requiredRole?: UserRole;
+  children: React.ReactNode;
+  requiredRole?: "admin";
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ 
@@ -14,24 +15,20 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 }) => {
   const { currentUser } = useUser();
 
-  // If there's no user, redirect to login
+  // If not logged in, redirect to login
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 
-  // If a specific role is required, check for it
-  if (requiredRole) {
-    // Admin override - admins can access everything
-    if (currentUser.isAdmin) {
-      return <>{children}</>;
-    }
-    
-    // For non-admins, check if they have the required role
-    if (currentUser.role !== requiredRole) {
-      return <Navigate to="/" replace />;
-    }
+  // If role requirement specified, check if user has required role
+  if (requiredRole === "admin" && !currentUser.isAdmin) {
+    return <Navigate to="/" replace />;
   }
 
-  // User is authenticated and has required role (if specified)
-  return <>{children}</>;
+  // User is authenticated and authorized, render the children
+  return (
+    <MobileLayout>
+      {children}
+    </MobileLayout>
+  );
 };
