@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useUser } from "@/contexts/UserContext";
+import { useUser, NotificationPreference } from "@/contexts/UserContext";
 import {
   Card,
   CardContent,
@@ -18,6 +18,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Pencil, ArrowLeft } from "lucide-react";
 import { usePermission } from "@/contexts/PermissionContext";
 import { Link } from "react-router-dom";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Profile = () => {
   const { currentUser, setCurrentUser } = useUser();
@@ -32,6 +33,7 @@ const Profile = () => {
     comments: currentUser?.comments || "",
     feedback: currentUser?.feedback || "",
     photoUrl: currentUser?.photoUrl || "",
+    notificationPreference: currentUser?.notificationPreference || null,
   });
   
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -41,6 +43,13 @@ const Profile = () => {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleNotificationChange = (value: NotificationPreference) => {
+    setFormData(prev => ({
+      ...prev,
+      notificationPreference: value
     }));
   };
 
@@ -65,6 +74,7 @@ const Profile = () => {
       comments: currentUser?.comments || "",
       feedback: currentUser?.feedback || "",
       photoUrl: currentUser?.photoUrl || "",
+      notificationPreference: currentUser?.notificationPreference || null,
     });
     setIsEditing(true);
   };
@@ -89,6 +99,7 @@ const Profile = () => {
         comments: formData.comments,
         feedback: formData.feedback,
         photoUrl: formData.photoUrl,
+        notificationPreference: formData.notificationPreference,
       });
       
       toast({
@@ -220,6 +231,33 @@ const Profile = () => {
                     />
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Notification Preferences</Label>
+                  <div className="border border-input rounded-md p-4 bg-background">
+                    <RadioGroup 
+                      value={formData.notificationPreference || ""} 
+                      onValueChange={(value) => handleNotificationChange(value as NotificationPreference)}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="email" id="notification-email" />
+                        <Label htmlFor="notification-email" className="cursor-pointer">Email notifications</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="sms" id="notification-sms" />
+                        <Label htmlFor="notification-sms" className="cursor-pointer">SMS notifications</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="" id="notification-none" />
+                        <Label htmlFor="notification-none" className="cursor-pointer">No notifications</Label>
+                      </div>
+                    </RadioGroup>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Choose how you'd like to receive updates about assignments and camp activities.
+                    </p>
+                  </div>
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
@@ -308,6 +346,15 @@ const Profile = () => {
                   <div className="border border-input bg-background px-3 py-2 rounded-md text-base">
                     {currentUser.role}
                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="view-notifications">Notification Preferences</Label>
+                <div className="border border-input bg-background px-3 py-2 rounded-md text-base">
+                  {currentUser.notificationPreference === "email" && "Email notifications"}
+                  {currentUser.notificationPreference === "sms" && "SMS notifications"}
+                  {!currentUser.notificationPreference && "No notifications selected"}
                 </div>
               </div>
               

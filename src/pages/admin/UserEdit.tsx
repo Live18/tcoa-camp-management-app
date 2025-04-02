@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useUser, UserRole } from "@/contexts/UserContext";
+import { useUser, UserRole, NotificationPreference } from "@/contexts/UserContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import { toast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
@@ -37,6 +37,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -45,6 +46,7 @@ const formSchema = z.object({
   bio: z.string().optional(),
   role: z.enum(["camper", "observer", "presenter", "admin"]),
   comments: z.string().optional(),
+  notificationPreference: z.enum(["email", "sms", ""]).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -66,6 +68,7 @@ const UserEdit = () => {
       bio: user?.bio || "",
       role: user?.role || "camper",
       comments: user?.comments || "",
+      notificationPreference: user?.notificationPreference || "",
     },
   });
 
@@ -79,6 +82,7 @@ const UserEdit = () => {
         bio: user.bio || "",
         role: user.role,
         comments: user.comments || "",
+        notificationPreference: user.notificationPreference || "",
       });
     }
   }, [user, form]);
@@ -93,6 +97,11 @@ const UserEdit = () => {
       return;
     }
 
+    // Convert empty string notification preference to null
+    const notificationPreference = data.notificationPreference === "" 
+      ? null 
+      : data.notificationPreference as NotificationPreference;
+
     // Update the user
     setUsers(prevUsers =>
       prevUsers.map(u =>
@@ -106,6 +115,7 @@ const UserEdit = () => {
               role: data.role as UserRole,
               isAdmin: data.role === "admin",
               comments: data.comments,
+              notificationPreference,
             }
           : u
       )
@@ -250,6 +260,40 @@ const UserEdit = () => {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="notificationPreference"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>Notification Preferences</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="email" id="notification-email" />
+                            <Label htmlFor="notification-email">Email notifications</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="sms" id="notification-sms" />
+                            <Label htmlFor="notification-sms">SMS notifications</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="" id="notification-none" />
+                            <Label htmlFor="notification-none">No notifications</Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormDescription>
+                        How this user will receive notifications about assignments and updates
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <FormField
                   control={form.control}

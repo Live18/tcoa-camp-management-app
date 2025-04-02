@@ -1,123 +1,231 @@
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { UserProvider } from "@/contexts/UserContext";
+import { PermissionProvider } from "@/contexts/PermissionContext";
+import { GameProvider } from "@/contexts/GameContext";
+import { ClassroomSessionProvider } from "@/contexts/ClassroomSessionContext";
+import { LocationProvider } from "@/contexts/LocationContext";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { Login } from "@/pages/Login";
+import Register from "@/pages/Register";
+import Home from "@/pages/Home";
+import Profile from "@/pages/Profile";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import UserManagement from "@/pages/admin/UserManagement";
+import UserDetail from "@/pages/admin/UserDetail";
+import UserEdit from "@/pages/admin/UserEdit";
+import LocationManagement from "@/pages/admin/LocationManagement";
+import LocationDetail from "@/pages/admin/LocationDetail";
+import LocationEdit from "@/pages/admin/LocationEdit";
+import LocationNew from "@/pages/admin/LocationNew";
+import GameManagement from "@/pages/admin/GameManagement";
+import GameDetail from "@/pages/admin/GameDetail";
+import GameEdit from "@/pages/admin/GameEdit";
+import GameNew from "@/pages/admin/GameNew";
+import SessionManagement from "@/pages/admin/SessionManagement";
+import SessionDetail from "@/pages/admin/SessionDetail";
+import SessionEdit from "@/pages/admin/SessionEdit";
+import SessionNew from "@/pages/admin/SessionNew";
+import ManageAdmins from "@/pages/admin/ManageAdmins";
+import Assignments from "@/pages/admin/Assignments";
+import Invitations from "@/pages/admin/Invitations";
+import Notifications from "@/pages/admin/Notifications";
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { UserProvider } from "./contexts/UserContext";
-import { GameProvider } from "./contexts/GameContext";
-import { ClassroomSessionProvider } from "./contexts/ClassroomSessionContext";
-import { LocationProvider } from "./contexts/LocationContext";
-import { PermissionProvider } from "./contexts/PermissionContext";
-import { MobileLayout } from "./components/layout/MobileLayout";
-import EndCamp from "./pages/admin/EndCamp";
-
-// Pages
-import Index from "./pages/Index";
-import Profile from "./pages/Profile";
-import Games from "./pages/Games";
-import GameDetails from "./pages/GameDetails";
-import ClassroomSessions from "./pages/ClassroomSessions";
-import ClassroomSessionDetails from "./pages/ClassroomSessionDetails";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import UserManagement from "./pages/admin/UserManagement";
-import UserDetail from "./pages/admin/UserDetail";
-import UserEdit from "./pages/admin/UserEdit";
-import LocationManagement from "./pages/admin/LocationManagement";
-import LocationCreate from "./pages/admin/LocationCreate";
-import LocationEdit from "./pages/admin/LocationEdit";
-import LocationDetails from "./pages/admin/LocationDetails";
-import LocationGames from "./pages/admin/LocationGames";
-import LocationSessions from "./pages/admin/LocationSessions";
-import GameManagement from "./pages/admin/GameManagement";
-import GameCreate from "./pages/admin/GameCreate";
-import GameEdit from "./pages/admin/GameEdit";
-import GameDetail from "./pages/admin/GameDetail";
-import ClassroomSessionManagement from "./pages/admin/ClassroomSessionManagement";
-import ClassroomSessionCreate from "./pages/admin/ClassroomSessionCreate";
-import ClassroomSessionEdit from "./pages/admin/ClassroomSessionEdit";
-import SessionDetail from "./pages/admin/SessionDetail";
-import AdminManagement from "./pages/admin/AdminManagement";
-import AdminCreate from "./pages/admin/AdminCreate";
-import AdminEdit from "./pages/admin/AdminEdit";
-import Assignments from "./pages/admin/Assignments";
-import Invitations from "./pages/admin/Invitations";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <UserProvider>
-        <PermissionProvider>
-          <LocationProvider>
-            <GameProvider>
-              <ClassroomSessionProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <Routes>
-                    <Route element={<MobileLayout />}>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/games" element={<Games />} />
-                      <Route path="/games/:id" element={<GameDetails />} />
-                      <Route path="/classroom-sessions" element={<ClassroomSessions />} />
-                      <Route path="/classroom-sessions/:id" element={<ClassroomSessionDetails />} />
-                      <Route path="/admin" element={<AdminDashboard />} />
-                      <Route path="/admin/users" element={<UserManagement />} />
-                      <Route path="/admin/users/:id" element={<UserDetail />} />
-                      <Route path="/admin/users/edit/:id" element={<UserEdit />} />
-                      <Route path="/admin/locations" element={<LocationManagement />} />
-                      <Route path="/admin/locations/new" element={<LocationCreate />} />
-                      <Route path="/admin/locations/:id" element={<LocationDetails />} />
-                      <Route path="/admin/locations/edit/:id" element={<LocationEdit />} />
-                      <Route path="/admin/locations/:id/games" element={<LocationGames />} />
-                      <Route path="/admin/locations/:id/sessions" element={<LocationSessions />} />
-                      
-                      {/* Game Management Routes */}
-                      <Route path="/admin/games" element={<GameManagement />} />
-                      <Route path="/admin/games/new" element={<GameCreate />} />
-                      <Route path="/admin/games/edit/:id" element={<GameEdit />} />
-                      <Route path="/admin/games/:id" element={<GameDetail />} />
-                      
-                      {/* Classroom Session Management Routes */}
-                      <Route path="/admin/classroom-sessions" element={<ClassroomSessionManagement />} />
-                      <Route path="/admin/classroom-sessions/new" element={<ClassroomSessionCreate />} />
-                      <Route path="/admin/classroom-sessions/edit/:id" element={<ClassroomSessionEdit />} />
-                      <Route path="/admin/sessions/:id" element={<SessionDetail />} />
-                      
-                      {/* Admin Management Routes */}
-                      <Route path="/admin/manage-admins" element={<AdminManagement />} />
-                      <Route path="/admin/manage-admins/new" element={<AdminCreate />} />
-                      <Route path="/admin/manage-admins/edit/:id" element={<AdminEdit />} />
-
-                      {/* Assignments Management Route */}
-                      <Route path="/admin/assignments" element={<Assignments />} />
-                      
-                      {/* Invitations Management Route */}
-                      <Route path="/admin/invitations" element={<Invitations />} />
-                      
-                      {/* End Camp Route */}
-                      <Route path="/admin/end-camp" element={<EndCamp />} />
-                      
-                      {/* Redirect Routes */}
-                      <Route path="/admin/sessions" element={<Navigate to="/admin/classroom-sessions" replace />} />
-                      <Route path="/admin/sessions/*" element={<Navigate to="/admin/classroom-sessions" replace />} />
-                      
-                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                      <Route path="*" element={<NotFound />} />
-                    </Route>
-                  </Routes>
-                </BrowserRouter>
-              </ClassroomSessionProvider>
-            </GameProvider>
-          </LocationProvider>
-        </PermissionProvider>
-      </UserProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <UserProvider>
+      <PermissionProvider>
+        <LocationProvider>
+          <GameProvider>
+            <ClassroomSessionProvider>
+              <Router>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route
+                    path="/"
+                    element={
+                      <AuthGuard>
+                        <Home />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <AuthGuard>
+                        <Profile />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <AdminDashboard />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/users"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <UserManagement />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/users/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <UserDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/users/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <UserEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/locations"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <LocationManagement />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/locations/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <LocationDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/locations/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <LocationEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/locations/new"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <LocationNew />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/games"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <GameManagement />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/games/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <GameDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/games/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <GameEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/games/new"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <GameNew />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/sessions"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionManagement />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/sessions/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/sessions/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/sessions/new"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionNew />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/manage-admins"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <ManageAdmins />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/assignments"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <Assignments />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/invitations"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <Invitations />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/notifications"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <Notifications />
+                      </AuthGuard>
+                    }
+                  />
+                </Routes>
+              </Router>
+            </ClassroomSessionProvider>
+          </GameProvider>
+        </LocationProvider>
+      </PermissionProvider>
+    </UserProvider>
+  );
+}
 
 export default App;

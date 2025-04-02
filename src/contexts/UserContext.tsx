@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export type UserRole = "camper" | "observer" | "presenter" | "admin";
+export type NotificationPreference = "email" | "sms" | null;
 
 interface User {
   id: string;
@@ -14,6 +15,7 @@ interface User {
   isAdmin: boolean;
   comments?: string;
   feedback?: string; // Added feedback field for campers
+  notificationPreference?: NotificationPreference;
 }
 
 interface UserContextType {
@@ -37,6 +39,7 @@ const sampleUsers: User[] = [
     phone: "555-123-4567",
     role: "admin",
     isAdmin: true,
+    notificationPreference: "email",
   },
   {
     id: "2",
@@ -47,7 +50,8 @@ const sampleUsers: User[] = [
     phone: "555-987-6543",
     role: "presenter",
     isAdmin: false,
-    comments: "Excited to teach basketball fundamentals!"
+    comments: "Excited to teach basketball fundamentals!",
+    notificationPreference: "sms",
   },
   {
     id: "3",
@@ -58,7 +62,8 @@ const sampleUsers: User[] = [
     phone: "555-234-5678",
     role: "camper",
     isAdmin: false,
-    feedback: "I'm loving this camp so far! The basketball drills are challenging but fun."
+    feedback: "I'm loving this camp so far! The basketball drills are challenging but fun.",
+    notificationPreference: null,
   },
 ];
 

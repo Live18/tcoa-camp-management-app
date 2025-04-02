@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { UserRole } from "@/contexts/UserContext";
+import { UserRole, NotificationPreference } from "@/contexts/UserContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import {
   Card,
@@ -39,6 +39,7 @@ interface User {
   isAdmin: boolean;
   comments?: string;
   feedback?: string;
+  notificationPreference?: NotificationPreference;
 }
 
 interface UserProfileCardProps {
@@ -64,6 +65,12 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({ user, handleDe
       case "observer": return "bg-green-100 text-green-800";
       default: return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getNotificationPreferenceText = (pref: NotificationPreference) => {
+    if (pref === "email") return "Email notifications";
+    if (pref === "sms") return "SMS notifications";
+    return "No notifications";
   };
 
   return (
@@ -156,6 +163,13 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({ user, handleDe
                 <div className="border border-input bg-background px-3 py-2 rounded-md text-base">
                   {user.id}
                 </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Notification Preferences</Label>
+              <div className="border border-input bg-background px-3 py-2 rounded-md text-base">
+                {getNotificationPreferenceText(user.notificationPreference)}
               </div>
             </div>
             

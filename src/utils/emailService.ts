@@ -65,3 +65,39 @@ Basketball Camp Administration Team
 
   return { subject, body };
 };
+
+/**
+ * Generate notification email content
+ */
+export const generateNotificationEmail = (
+  title: string,
+  message: string
+): { subject: string; body: string } => {
+  const subject = `Basketball Camp Notification: ${title}`;
+  
+  const body = `
+Hello,
+
+${message}
+
+This is an automated notification from the Basketball Camp platform.
+
+Thank you,
+Basketball Camp Administration Team
+`;
+
+  return { subject, body };
+};
+
+/**
+ * Send SMS notification (mocked)
+ * In a real app, this would integrate with a service like Twilio
+ */
+export const sendSmsNotification = (
+  phone: string,
+  message: string
+): boolean => {
+  // This is a mock function - in a real app this would call a service like Twilio
+  console.log(`Sending SMS to ${phone}: ${message}`);
+  return true;
+};
