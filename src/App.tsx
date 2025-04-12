@@ -21,7 +21,7 @@ import UserEdit from "@/pages/admin/UserEdit";
 import LocationManagement from "@/pages/admin/LocationManagement";
 import LocationDetail from "@/pages/admin/LocationDetail";
 import LocationEdit from "@/pages/admin/LocationEdit";
-import LocationNew from "@/pages/admin/LocationNew";
+import LocationCreate from "@/pages/admin/LocationCreate";
 import GameManagement from "@/pages/admin/GameManagement";
 import GameDetail from "@/pages/admin/GameDetail";
 import GameEdit from "@/pages/admin/GameEdit";
@@ -157,7 +157,7 @@ function App() {
                     path="/admin/locations/new"
                     element={
                       <AuthGuard requiredRole="admin">
-                        <LocationNew />
+                        <LocationCreate />
                       </AuthGuard>
                     }
                   />
