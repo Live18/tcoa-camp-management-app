@@ -48,8 +48,11 @@ function App() {
             <ClassroomSessionProvider>
               <Router>
                 <Routes>
+                  {/* Public routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  
+                  {/* Protected user routes */}
                   <Route
                     path="/"
                     element={
@@ -66,7 +69,6 @@ function App() {
                       </AuthGuard>
                     }
                   />
-                  {/* Add the missing routes for Games and ClassroomSessions */}
                   <Route
                     path="/games"
                     element={
@@ -99,7 +101,8 @@ function App() {
                       </AuthGuard>
                     }
                   />
-                  {/* Admin routes */}
+                  
+                  {/* Admin routes - Note the order of routes is important */}
                   <Route
                     path="/admin"
                     element={
@@ -108,6 +111,8 @@ function App() {
                       </AuthGuard>
                     }
                   />
+                  
+                  {/* Admin user management routes */}
                   <Route
                     path="/admin/users"
                     element={
@@ -132,27 +137,13 @@ function App() {
                       </AuthGuard>
                     }
                   />
+                  
+                  {/* Admin location management routes */}
                   <Route
                     path="/admin/locations"
                     element={
                       <AuthGuard requiredRole="admin">
                         <LocationManagement />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/locations/:id"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <LocationDetail />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/locations/edit/:id"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <LocationEdit />
                       </AuthGuard>
                     }
                   />
@@ -165,26 +156,28 @@ function App() {
                     }
                   />
                   <Route
+                    path="/admin/locations/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <LocationEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/locations/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <LocationDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  
+                  {/* Admin game management routes */}
+                  <Route
                     path="/admin/games"
                     element={
                       <AuthGuard requiredRole="admin">
                         <GameManagement />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/games/:id"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <GameDetail />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/games/edit/:id"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <GameEdit />
                       </AuthGuard>
                     }
                   />
@@ -197,6 +190,24 @@ function App() {
                     }
                   />
                   <Route
+                    path="/admin/games/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <GameEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/games/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <GameDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  
+                  {/* Admin session management routes - Fix the order here */}
+                  <Route
                     path="/admin/sessions"
                     element={
                       <AuthGuard requiredRole="admin">
@@ -205,10 +216,10 @@ function App() {
                     }
                   />
                   <Route
-                    path="/admin/sessions/:id"
+                    path="/admin/sessions/new"
                     element={
                       <AuthGuard requiredRole="admin">
-                        <SessionDetail />
+                        <SessionNew />
                       </AuthGuard>
                     }
                   />
@@ -221,13 +232,49 @@ function App() {
                     }
                   />
                   <Route
-                    path="/admin/sessions/new"
+                    path="/admin/sessions/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  
+                  {/* Admin classroom session management routes - Fix the order here */}
+                  <Route
+                    path="/admin/classroom-sessions"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <ClassroomSessionManagement />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/classroom-sessions/new"
                     element={
                       <AuthGuard requiredRole="admin">
                         <SessionNew />
                       </AuthGuard>
                     }
                   />
+                  <Route
+                    path="/admin/classroom-sessions/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionEdit />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/classroom-sessions/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  
+                  {/* Other admin routes */}
                   <Route
                     path="/admin/manage-admins"
                     element={
@@ -260,45 +307,11 @@ function App() {
                       </AuthGuard>
                     }
                   />
-                  {/* Add the End Camp route */}
                   <Route
                     path="/admin/end-camp"
                     element={
                       <AuthGuard requiredRole="admin">
                         <EndCamp />
-                      </AuthGuard>
-                    }
-                  />
-                  {/* Add the classroom sessions routes */}
-                  <Route
-                    path="/admin/classroom-sessions"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <ClassroomSessionManagement />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/classroom-sessions/:id"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <SessionDetail />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/classroom-sessions/new"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <SessionNew />
-                      </AuthGuard>
-                    }
-                  />
-                  <Route
-                    path="/admin/classroom-sessions/edit/:id"
-                    element={
-                      <AuthGuard requiredRole="admin">
-                        <SessionEdit />
                       </AuthGuard>
                     }
                   />

@@ -17,13 +17,17 @@ const SessionDetail = () => {
   const { getSession, updateSession, publishAttendees } = useClassroomSession();
   const { getLocation } = useLocation();
   
+  // Determine the path we came from to dynamically set the back button
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+  const backPath = isAdminRoute ? "/admin/classroom-sessions" : "/admin/sessions";
+  
   const session = getSession(id || "");
   
   if (!session) {
     return (
       <div className="container mx-auto py-8">
-        <Button variant="ghost" onClick={() => navigate("/admin/classroom-sessions")} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Sessions
+        <Button variant="ghost" onClick={() => navigate(backPath)} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back 
         </Button>
         <Card>
           <CardContent className="py-8 text-center">
@@ -31,7 +35,7 @@ const SessionDetail = () => {
             <p className="text-muted-foreground">
               The classroom session you're looking for doesn't exist or has been removed.
             </p>
-            <Button onClick={() => navigate("/admin/classroom-sessions")} className="mt-4">
+            <Button onClick={() => navigate(backPath)} className="mt-4">
               View All Sessions
             </Button>
           </CardContent>
@@ -100,7 +104,7 @@ const SessionDetail = () => {
   return (
     <PermissionGate action="session.view">
       <div className="container mx-auto py-6">
-        <Button variant="ghost" onClick={() => navigate("/admin/classroom-sessions")} className="mb-4">
+        <Button variant="ghost" onClick={() => navigate(backPath)} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Sessions
         </Button>
         
