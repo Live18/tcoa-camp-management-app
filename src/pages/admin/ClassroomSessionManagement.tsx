@@ -118,8 +118,16 @@ const ClassroomSessionManagement = () => {
                   {sessions.map((session) => {
                     const location = getLocation(session.locationId);
                     return (
-                      <TableRow key={session.id}>
-                        <TableCell className="font-medium">{session.title}</TableCell>
+                      <TableRow key={session.id} className="group">
+                        <TableCell className="font-medium">
+                          <Button 
+                            variant="link" 
+                            className="p-0 h-auto font-medium text-foreground hover:text-primary justify-start"
+                            onClick={() => navigate(`/classroom-sessions/${session.id}`)}
+                          >
+                            {session.title}
+                          </Button>
+                        </TableCell>
                         <TableCell>
                           {location ? location.name : "Unknown"} - {session.roomName}
                         </TableCell>
