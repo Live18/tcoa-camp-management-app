@@ -36,6 +36,9 @@ import Invitations from "@/pages/admin/Invitations";
 import Notifications from "@/pages/admin/Notifications";
 import EndCamp from "@/pages/admin/EndCamp";
 
+// Import ClassroomSessionManagement component
+import ClassroomSessionManagement from "@/pages/admin/ClassroomSessionManagement";
+
 function App() {
   return (
     <UserProvider>
@@ -263,6 +266,31 @@ function App() {
                     element={
                       <AuthGuard requiredRole="admin">
                         <EndCamp />
+                      </AuthGuard>
+                    }
+                  />
+                  {/* Add the classroom sessions routes */}
+                  <Route
+                    path="/admin/classroom-sessions"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <ClassroomSessionManagement />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/classroom-sessions/new"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionNew />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/classroom-sessions/edit/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionEdit />
                       </AuthGuard>
                     }
                   />

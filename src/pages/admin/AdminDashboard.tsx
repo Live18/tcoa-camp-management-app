@@ -213,7 +213,7 @@ const AdminDashboard = () => {
               <CardFooter>
                 <div className="flex flex-col space-y-2 w-full">
                   <Button 
-                    onClick={() => navigate("/admin/sessions")}
+                    onClick={() => navigate("/admin/classroom-sessions")}
                     className="w-full"
                     variant={isAdmin ? "default" : "outline"}
                     disabled={!can("session.edit")}
@@ -222,7 +222,7 @@ const AdminDashboard = () => {
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => navigate("/admin/sessions/new")}
+                    onClick={() => navigate("/admin/classroom-sessions/new")}
                     className="w-full"
                     disabled={!can("session.create")}
                   >
