@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
@@ -30,6 +31,7 @@ import ManageAdmins from "@/pages/admin/ManageAdmins";
 import Assignments from "@/pages/admin/Assignments";
 import Invitations from "@/pages/admin/Invitations";
 import Notifications from "@/pages/admin/Notifications";
+import EndCamp from "@/pages/admin/EndCamp";
 
 function App() {
   return (
@@ -215,6 +217,15 @@ function App() {
                     element={
                       <AuthGuard requiredRole="admin">
                         <Notifications />
+                      </AuthGuard>
+                    }
+                  />
+                  {/* Add the End Camp route */}
+                  <Route
+                    path="/admin/end-camp"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <EndCamp />
                       </AuthGuard>
                     }
                   />
