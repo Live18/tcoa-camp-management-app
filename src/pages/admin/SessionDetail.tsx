@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
@@ -18,8 +17,12 @@ const SessionDetail = () => {
   const { getLocation } = useLocation();
   
   // Determine the path we came from to dynamically set the back button
-  const isAdminRoute = window.location.pathname.startsWith('/admin');
-  const backPath = isAdminRoute ? "/admin/classroom-sessions" : "/admin/sessions";
+  // This will now properly distinguish between /admin/sessions and /admin/classroom-sessions
+  const pathname = window.location.pathname;
+  const isClassroomSession = pathname.includes("classroom-sessions");
+  const backPath = isClassroomSession 
+    ? "/admin/classroom-sessions" 
+    : "/admin/sessions";
   
   const session = getSession(id || "");
   
@@ -105,7 +108,7 @@ const SessionDetail = () => {
     <PermissionGate action="session.view">
       <div className="container mx-auto py-6">
         <Button variant="ghost" onClick={() => navigate(backPath)} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Sessions
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to {isClassroomSession ? "Classroom Sessions" : "Sessions"}
         </Button>
         
         <Card className="mb-6">
