@@ -279,6 +279,14 @@ function App() {
                     }
                   />
                   <Route
+                    path="/admin/classroom-sessions/:id"
+                    element={
+                      <AuthGuard requiredRole="admin">
+                        <SessionDetail />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
                     path="/admin/classroom-sessions/new"
                     element={
                       <AuthGuard requiredRole="admin">
