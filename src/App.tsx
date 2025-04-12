@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
@@ -11,6 +10,10 @@ import { Login } from "@/pages/Login";
 import Register from "@/pages/Register";
 import Home from "@/pages/Home";
 import Profile from "@/pages/Profile";
+import Games from "@/pages/Games";
+import ClassroomSessions from "@/pages/ClassroomSessions";
+import GameDetails from "@/pages/GameDetails";
+import ClassroomSessionDetails from "@/pages/ClassroomSessionDetails";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import UserManagement from "@/pages/admin/UserManagement";
 import UserDetail from "@/pages/admin/UserDetail";
@@ -60,6 +63,40 @@ function App() {
                       </AuthGuard>
                     }
                   />
+                  {/* Add the missing routes for Games and ClassroomSessions */}
+                  <Route
+                    path="/games"
+                    element={
+                      <AuthGuard>
+                        <Games />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/games/:id"
+                    element={
+                      <AuthGuard>
+                        <GameDetails />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/classroom-sessions"
+                    element={
+                      <AuthGuard>
+                        <ClassroomSessions />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/classroom-sessions/:id"
+                    element={
+                      <AuthGuard>
+                        <ClassroomSessionDetails />
+                      </AuthGuard>
+                    }
+                  />
+                  {/* Admin routes */}
                   <Route
                     path="/admin"
                     element={
