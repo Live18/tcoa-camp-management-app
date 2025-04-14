@@ -34,6 +34,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserPlus } from "lucide-react";
+import { sendNotification } from "@/utils/notificationService";
 
 const formSchema = z.object({
   userId: z.string().min(1, "Please select a user"),
@@ -58,21 +59,61 @@ const AdminCreate = () => {
   });
 
   const onSubmit = (data: FormData) => {
+    // Get the user being promoted to admin
+    const user = users.find(u => u.id === data.userId);
+    
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not found.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Update the user to make them an admin
     setUsers(prevUsers =>
-      prevUsers.map(user =>
-        user.id === data.userId
-          ? { ...user, isAdmin: true, role: "admin", comments: data.comments || user.comments }
-          : user
+      prevUsers.map(u =>
+        u.id === data.userId
+          ? { ...u, isAdmin: true, role: "admin", comments: data.comments || u.comments }
+          : u
       )
     );
-
-    // Get the user's name for the toast message
-    const user = users.find(u => u.id === data.userId);
+    
+    // Send notification to the new admin based on their preference
+    if (user.notificationPreference) {
+      const notificationTitle = "Admin Access Granted";
+      const notificationMessage = `You have been granted administrator access to the Basketball Camp platform. You now have full administrative privileges.`;
+      
+      const notificationSent = sendNotification({
+        title: notificationTitle,
+        message: notificationMessage,
+        user: user
+      });
+      
+      if (notificationSent) {
+        toast({
+          title: "Notification Sent",
+          description: `A notification has been sent to ${user.name} via ${user.notificationPreference}.`,
+        });
+      } else {
+        toast({
+          title: "Notification Failed",
+          description: `Could not send notification to ${user.name}. Please inform them manually.`,
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "No Notification Sent",
+        description: `${user.name} has no notification preferences set. Please inform them manually.`,
+        variant: "warning",
+      });
+    }
     
     toast({
       title: "Admin Added",
-      description: `${user?.name} has been granted admin privileges.`,
+      description: `${user.name} has been granted admin privileges.`,
     });
 
     navigate("/admin/manage-admins");
@@ -119,6 +160,11 @@ const AdminCreate = () => {
                             nonAdminUsers.map((user) => (
                               <SelectItem key={user.id} value={user.id}>
                                 {user.name} ({user.email})
+                                {user.notificationPreference && (
+                                  <span className="ml-2 text-xs text-muted-foreground">
+                                    • {user.notificationPreference} notifications enabled
+                                  </span>
+                                )}
                               </SelectItem>
                             ))
                           ) : (

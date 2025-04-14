@@ -55,6 +55,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { sendNotification } from "@/utils/notificationService";
 import { 
   ArrowLeftRight,
   ClipboardList,
@@ -103,12 +104,43 @@ const ManageAdmins = () => {
   };
   
   const handleRemoveAdmin = (id: string, name: string) => {
+    // Get the user being demoted
+    const user = users.find(u => u.id === id);
+    
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not found.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Update users list, removing the admin flag instead of deleting the user
     setUsers(prevUsers =>
-      prevUsers.map(user =>
-        user.id === id ? { ...user, isAdmin: false, role: "presenter", isSuperAdmin: false } : user
+      prevUsers.map(u =>
+        u.id === id ? { ...u, isAdmin: false, role: "presenter", isSuperAdmin: false } : u
       )
     );
+    
+    // Send notification to the demoted admin based on their preference
+    if (user.notificationPreference) {
+      const notificationTitle = "Admin Access Removed";
+      const notificationMessage = `Your administrator access to the Basketball Camp platform has been revoked. You now have presenter privileges.`;
+      
+      const notificationSent = sendNotification({
+        title: notificationTitle,
+        message: notificationMessage,
+        user: user
+      });
+      
+      if (notificationSent) {
+        toast({
+          title: "Notification Sent",
+          description: `A notification has been sent to ${user.name} via ${user.notificationPreference}.`,
+        });
+      }
+    }
     
     toast({
       title: "Admin Removed",
@@ -118,7 +150,20 @@ const ManageAdmins = () => {
   
   const handleGrantSuperAdmin = (userId: string, userName: string) => {
     try {
+      // Get the user being promoted
+      const user = users.find(u => u.id === userId);
+      
       grantSuperAdminStatus(userId);
+      
+      // Send notification if the user has preferences set
+      if (user?.notificationPreference) {
+        sendNotification({
+          title: "Super Admin Status Granted",
+          message: "You have been granted Super Administrator status. You now have full control over all admin privileges and can manage other admins.",
+          user: user
+        });
+      }
+      
       toast({
         title: "Success",
         description: `${userName} is now a Super Admin.`,
@@ -134,7 +179,20 @@ const ManageAdmins = () => {
   
   const handleRevokeSuperAdmin = (userId: string, userName: string) => {
     try {
+      // Get the user being demoted
+      const user = users.find(u => u.id === userId);
+      
       revokeSuperAdminStatus(userId);
+      
+      // Send notification if the user has preferences set
+      if (user?.notificationPreference) {
+        sendNotification({
+          title: "Super Admin Status Revoked",
+          message: "Your Super Administrator status has been revoked. You still retain regular administrator privileges.",
+          user: user
+        });
+      }
+      
       toast({
         title: "Super Admin Revoked",
         description: `${userName} is no longer a Super Admin.`,
@@ -150,7 +208,29 @@ const ManageAdmins = () => {
   
   const handleTransferSuperAdmin = (userId: string, userName: string) => {
     try {
+      // Get the user receiving super admin status
+      const user = users.find(u => u.id === userId);
+      
       transferSuperAdminStatus(userId);
+      
+      // Send notification if the user has preferences set
+      if (user?.notificationPreference) {
+        sendNotification({
+          title: "Super Admin Status Transferred",
+          message: "You have been granted Super Administrator status. This gives you full control over all admin privileges and management.",
+          user: user
+        });
+      }
+      
+      // Also notify the current user that they lost super admin status
+      if (currentUser?.notificationPreference && currentUser?.id !== userId) {
+        sendNotification({
+          title: "Super Admin Status Transferred",
+          message: "Your Super Administrator status has been transferred. You now have regular administrator privileges.",
+          user: currentUser
+        });
+      }
+      
       toast({
         title: "Super Admin Transferred",
         description: `Super Admin privileges have been transferred to ${userName}.`,
