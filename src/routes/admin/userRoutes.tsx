@@ -6,9 +6,11 @@ import UserManagement from "@/pages/admin/UserManagement";
 import UserDetail from "@/pages/admin/UserDetail";
 import UserEdit from "@/pages/admin/UserEdit";
 import AdminEdit from "@/pages/admin/AdminEdit";
+import ManageAdmins from "@/pages/admin/ManageAdmins";
 
 export const adminUserRoutes = (
   <>
+    {/* User management routes */}
     <Route
       path="/admin/users"
       element={
@@ -30,6 +32,16 @@ export const adminUserRoutes = (
       element={
         <AuthGuard requiredRole="admin">
           <UserDetail />
+        </AuthGuard>
+      }
+    />
+
+    {/* Admin management routes */}
+    <Route
+      path="/admin/manage-admins"
+      element={
+        <AuthGuard requiredRole="admin">
+          <ManageAdmins />
         </AuthGuard>
       }
     />
