@@ -131,39 +131,7 @@ export const adminRoutes = (
       }
     />
     
-    {/* Session/Classroom session management routes - important to maintain order */}
-    <Route
-      path="/admin/sessions"
-      element={
-        <AuthGuard requiredRole="admin">
-          <SessionManagement />
-        </AuthGuard>
-      }
-    />
-    <Route
-      path="/admin/sessions/new"
-      element={
-        <AuthGuard requiredRole="admin">
-          <SessionNew />
-        </AuthGuard>
-      }
-    />
-    <Route
-      path="/admin/sessions/edit/:id"
-      element={
-        <AuthGuard requiredRole="admin">
-          <SessionEdit />
-        </AuthGuard>
-      }
-    />
-    <Route
-      path="/admin/sessions/:id"
-      element={
-        <AuthGuard requiredRole="admin">
-          <SessionDetail />
-        </AuthGuard>
-      }
-    />
+    {/* Classroom Session management routes - specific routes first */}
     <Route
       path="/admin/classroom-sessions"
       element={
@@ -197,6 +165,40 @@ export const adminRoutes = (
       }
     />
     
+    {/* General Session management routes */}
+    <Route
+      path="/admin/sessions"
+      element={
+        <AuthGuard requiredRole="admin">
+          <SessionManagement />
+        </AuthGuard>
+      }
+    />
+    <Route
+      path="/admin/sessions/new"
+      element={
+        <AuthGuard requiredRole="admin">
+          <SessionNew />
+        </AuthGuard>
+      }
+    />
+    <Route
+      path="/admin/sessions/edit/:id"
+      element={
+        <AuthGuard requiredRole="admin">
+          <SessionEdit />
+        </AuthGuard>
+      }
+    />
+    <Route
+      path="/admin/sessions/:id"
+      element={
+        <AuthGuard requiredRole="admin">
+          <SessionDetail />
+        </AuthGuard>
+      }
+    />
+
     {/* Other admin routes */}
     <Route
       path="/admin/manage-admins"
