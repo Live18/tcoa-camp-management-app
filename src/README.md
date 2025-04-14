@@ -13,9 +13,19 @@ This project is a comprehensive management system for basketball camps, with fea
 
 ## Documentation
 
-For detailed documentation on the admin and user management system, please see:
+For detailed documentation on different aspects of the system, please see:
 
-- [Admin & User Management Documentation](./docs/admin-management-README.md)
+- [Documentation Overview](./docs/README.md)
+- [Admin Management](./docs/admin/admin-management.md)
+- [User Management](./docs/user/user-management.md)
+- [Game Management](./docs/game/game-management.md)
+- [Session Management](./docs/session/session-management.md)
+- [Location Management](./docs/location/location-management.md)
+- [Permission System](./docs/system/permission-system.md)
+- [Notification System](./docs/system/notification-system.md)
+- [User Assignment Process](./docs/system/user-assignment.md)
+- [Component Architecture](./docs/system/component-architecture.md)
+- [Error Handling](./docs/system/error-handling.md)
 
 ## Key Features
 
