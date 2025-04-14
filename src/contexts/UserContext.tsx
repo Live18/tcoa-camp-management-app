@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { User, AdminTransferLog, UserRole, NotificationPreference } from "@/types/userTypes";
+import { User, AdminTransferLog } from "@/types/userTypes";
 import { sampleUsers, initialAdminTransferLogs } from "@/data/sampleUsers";
 import { 
   transferSuperAdminStatus as transferSuperAdmin,
@@ -19,6 +19,7 @@ interface UserContextType {
   grantSuperAdminStatus: (userId: string) => void;
   revokeSuperAdminStatus: (userId: string) => void;
   adminTransferLogs: AdminTransferLog[];
+  setAdminTransferLogs: React.Dispatch<React.SetStateAction<AdminTransferLog[]>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -34,15 +35,21 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Admin operations using the extracted service functions
   const handleTransferSuperAdminStatus = (toUserId: string): void => {
-    transferSuperAdmin(toUserId, currentUser, users, setUsers, setCurrentUser, setAdminTransferLogs);
+    if (currentUser) {
+      transferSuperAdmin(toUserId, currentUser, users, setUsers, setCurrentUser, setAdminTransferLogs);
+    }
   };
 
   const handleGrantSuperAdminStatus = (userId: string): void => {
-    grantSuperAdmin(userId, currentUser, users, setUsers, setAdminTransferLogs);
+    if (currentUser) {
+      grantSuperAdmin(userId, currentUser, users, setUsers, setAdminTransferLogs);
+    }
   };
 
   const handleRevokeSuperAdminStatus = (userId: string): void => {
-    revokeSuperAdmin(userId, currentUser, users, setUsers, setAdminTransferLogs);
+    if (currentUser) {
+      revokeSuperAdmin(userId, currentUser, users, setUsers, setAdminTransferLogs);
+    }
   };
 
   return (
@@ -55,7 +62,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       transferSuperAdminStatus: handleTransferSuperAdminStatus,
       grantSuperAdminStatus: handleGrantSuperAdminStatus,
       revokeSuperAdminStatus: handleRevokeSuperAdminStatus,
-      adminTransferLogs
+      adminTransferLogs,
+      setAdminTransferLogs
     }}>
       {children}
     </UserContext.Provider>
@@ -71,5 +79,5 @@ export const useUser = () => {
   return context;
 };
 
-// Re-export types to maintain compatibility with existing code
-export { type UserRole, type NotificationPreference, type User };
+// Re-export types
+export type { User, UserRole, NotificationPreference } from "@/types/userTypes";

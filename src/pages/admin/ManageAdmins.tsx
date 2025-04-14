@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
@@ -29,7 +28,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -50,11 +48,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { sendNotification } from "@/utils/notificationService";
 import { 
   ArrowLeftRight,
@@ -67,8 +63,6 @@ import {
   ShieldAlert, 
   ShieldCheck, 
   ShieldX, 
-  Trash2, 
-  User,
   UserCog,
   UserMinus,
   UserPlus,
@@ -79,7 +73,6 @@ const ManageAdmins = () => {
   const { users, currentUser, setUsers, transferSuperAdminStatus, grantSuperAdminStatus, revokeSuperAdminStatus, adminTransferLogs } = useUser();
   const { can } = usePermission();
   const [isLogOpen, setIsLogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   // Filter only admin users
   const adminUsers = users.filter(user => user.isAdmin);
@@ -125,21 +118,11 @@ const ManageAdmins = () => {
     
     // Send notification to the demoted admin based on their preference
     if (user.notificationPreference) {
-      const notificationTitle = "Admin Access Removed";
-      const notificationMessage = `Your administrator access to the Basketball Camp platform has been revoked. You now have presenter privileges.`;
-      
-      const notificationSent = sendNotification({
-        title: notificationTitle,
-        message: notificationMessage,
+      sendNotification({
+        title: "Admin Access Removed",
+        message: `Your administrator access to the Basketball Camp platform has been revoked. You now have presenter privileges.`,
         user: user
       });
-      
-      if (notificationSent) {
-        toast({
-          title: "Notification Sent",
-          description: `A notification has been sent to ${user.name} via ${user.notificationPreference}.`,
-        });
-      }
     }
     
     toast({
@@ -147,27 +130,11 @@ const ManageAdmins = () => {
       description: `${name} is no longer an admin.`,
     });
   };
-  
-  const handleGrantSuperAdmin = (userId: string, userName: string) => {
+
+  // Updated to use the context methods directly
+  const handleGrantSuperAdmin = (userId: string) => {
     try {
-      // Get the user being promoted
-      const user = users.find(u => u.id === userId);
-      
       grantSuperAdminStatus(userId);
-      
-      // Send notification if the user has preferences set
-      if (user?.notificationPreference) {
-        sendNotification({
-          title: "Super Admin Status Granted",
-          message: "You have been granted Super Administrator status. You now have full control over all admin privileges and can manage other admins.",
-          user: user
-        });
-      }
-      
-      toast({
-        title: "Success",
-        description: `${userName} is now a Super Admin.`,
-      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -177,26 +144,9 @@ const ManageAdmins = () => {
     }
   };
   
-  const handleRevokeSuperAdmin = (userId: string, userName: string) => {
+  const handleRevokeSuperAdmin = (userId: string) => {
     try {
-      // Get the user being demoted
-      const user = users.find(u => u.id === userId);
-      
       revokeSuperAdminStatus(userId);
-      
-      // Send notification if the user has preferences set
-      if (user?.notificationPreference) {
-        sendNotification({
-          title: "Super Admin Status Revoked",
-          message: "Your Super Administrator status has been revoked. You still retain regular administrator privileges.",
-          user: user
-        });
-      }
-      
-      toast({
-        title: "Super Admin Revoked",
-        description: `${userName} is no longer a Super Admin.`,
-      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -206,35 +156,9 @@ const ManageAdmins = () => {
     }
   };
   
-  const handleTransferSuperAdmin = (userId: string, userName: string) => {
+  const handleTransferSuperAdmin = (userId: string) => {
     try {
-      // Get the user receiving super admin status
-      const user = users.find(u => u.id === userId);
-      
       transferSuperAdminStatus(userId);
-      
-      // Send notification if the user has preferences set
-      if (user?.notificationPreference) {
-        sendNotification({
-          title: "Super Admin Status Transferred",
-          message: "You have been granted Super Administrator status. This gives you full control over all admin privileges and management.",
-          user: user
-        });
-      }
-      
-      // Also notify the current user that they lost super admin status
-      if (currentUser?.notificationPreference && currentUser?.id !== userId) {
-        sendNotification({
-          title: "Super Admin Status Transferred",
-          message: "Your Super Administrator status has been transferred. You now have regular administrator privileges.",
-          user: currentUser
-        });
-      }
-      
-      toast({
-        title: "Super Admin Transferred",
-        description: `Super Admin privileges have been transferred to ${userName}.`,
-      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -405,7 +329,7 @@ const ManageAdmins = () => {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => handleGrantSuperAdmin(user.id, user.name)}
+                                        onClick={() => handleGrantSuperAdmin(user.id)}
                                       >
                                         Grant Super Admin
                                       </AlertDialogAction>
@@ -432,7 +356,7 @@ const ManageAdmins = () => {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => handleRevokeSuperAdmin(user.id, user.name)}
+                                        onClick={() => handleRevokeSuperAdmin(user.id)}
                                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                       >
                                         Revoke Super Admin
@@ -461,7 +385,7 @@ const ManageAdmins = () => {
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => handleTransferSuperAdmin(user.id, user.name)}
+                                        onClick={() => handleTransferSuperAdmin(user.id)}
                                         className="bg-amber-600 text-white hover:bg-amber-700"
                                       >
                                         Transfer Super Admin
