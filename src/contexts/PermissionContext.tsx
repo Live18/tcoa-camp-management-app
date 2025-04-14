@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, ReactNode } from "react";
 import { useUser, UserRole } from "@/contexts/UserContext";
 
@@ -38,7 +39,8 @@ export type PermissionAction =
   // Admin permissions
   | "admin.create"
   | "admin.manage"
-  | "admin.end_camp"; // Added permission for ending camp
+  | "admin.end_camp"
+  | "admin.manage_other_admins"; // Added new permission for Super Admins
 
 // Define the permission context type
 interface PermissionContextType {
@@ -53,7 +55,7 @@ const PermissionContext = createContext<PermissionContextType | undefined>(undef
 // Define role-based permissions
 const rolePermissions: Record<UserRole, PermissionAction[]> = {
   admin: [
-    // Admins can do everything
+    // Admins can do everything except manage other admins
     "user.view", "user.create", "user.edit", "user.delete",
     "location.view", "location.create", "location.edit", "location.delete",
     "game.view", "game.create", "game.edit", "game.delete", "game.manage_attendees",
@@ -88,8 +90,18 @@ export const PermissionProvider: React.FC<{ children: ReactNode }> = ({ children
   const can = (action: PermissionAction): boolean => {
     if (!currentUser) return false;
     
-    // Admin override - admins can do everything
-    if (currentUser.isAdmin) return true;
+    // Super Admin override - super admins can manage other admins
+    if (currentUser.isSuperAdmin && action === "admin.manage_other_admins") {
+      return true;
+    }
+    
+    // Admin override - admins can do everything except manage other admins
+    if (currentUser.isAdmin) {
+      if (action === "admin.manage_other_admins") {
+        return false; // Regular admins can't manage other admins
+      }
+      return true;
+    }
     
     // Check role-based permissions
     return rolePermissions[currentUser.role].includes(action);
