@@ -1,4 +1,3 @@
-
 import React from "react";
 import { User } from "@/types/userTypes";
 import { AdminTransferLog } from "@/services/admin";
