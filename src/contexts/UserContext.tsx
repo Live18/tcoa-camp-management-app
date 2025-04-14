@@ -1,12 +1,12 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { User, AdminTransferLog } from "@/types/userTypes";
+import { User } from "@/types/userTypes";
 import { sampleUsers, initialAdminTransferLogs } from "@/data/sampleUsers";
 import { 
   transferSuperAdminStatus as transferSuperAdmin,
   grantSuperAdminStatus as grantSuperAdmin,
-  revokeSuperAdminStatus as revokeSuperAdmin
-} from "@/services/adminService";
+  revokeSuperAdminStatus as revokeSuperAdmin,
+  AdminTransferLog
+} from "@/services/admin";
 
 // Context type definition
 interface UserContextType {
@@ -81,3 +81,4 @@ export const useUser = () => {
 
 // Re-export types
 export type { User, UserRole, NotificationPreference } from "@/types/userTypes";
+export type { AdminTransferLog } from "@/services/admin";

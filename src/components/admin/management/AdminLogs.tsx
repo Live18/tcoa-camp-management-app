@@ -1,6 +1,7 @@
 
 import React from "react";
-import { AdminTransferLog, User } from "@/contexts/UserContext";
+import { User } from "@/types/userTypes";
+import { AdminTransferLog } from "@/services/admin";
 import {
   Dialog,
   DialogContent,

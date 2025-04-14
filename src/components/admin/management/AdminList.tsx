@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, User } from "@/contexts/UserContext";
@@ -326,7 +325,7 @@ const AdminList: React.FC<AdminListProps> = ({ adminUsers }) => {
           <p className="text-muted-foreground">No admin users found</p>
           <PermissionGate action="admin.manage_other_admins">
             <Button onClick={() => navigate("/admin/manage-admins/new")} className="mt-4">
-              <ShieldPlus className="h-4 w-4 mr-2" /> Add Admin
+              <UserPlus className="h-4 w-4 mr-2" /> Add Admin
             </Button>
           </PermissionGate>
         </div>
