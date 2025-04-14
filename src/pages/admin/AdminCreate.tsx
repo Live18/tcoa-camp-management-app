@@ -107,7 +107,7 @@ const AdminCreate = () => {
       toast({
         title: "No Notification Sent",
         description: `${user.name} has no notification preferences set. Please inform them manually.`,
-        variant: "warning",
+        variant: "default", // Changed from "warning" to "default"
       });
     }
     
