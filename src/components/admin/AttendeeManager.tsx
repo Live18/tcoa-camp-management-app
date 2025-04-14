@@ -339,5 +339,3 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
     </Card>
   );
 };
-
-```
