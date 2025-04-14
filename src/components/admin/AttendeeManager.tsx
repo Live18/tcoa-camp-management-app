@@ -62,6 +62,9 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
   const [selectedRole, setSelectedRole] = useState<string>(allowedRoles[0]);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
   
+  // Default duration of 60 minutes for availability checks
+  const defaultDuration = 60;
+  
   // Update available users whenever attendees or event date changes
   useEffect(() => {
     // Get users who are not already attendees
@@ -72,9 +75,9 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
     // If we have an event date, filter by availability
     if (eventDate) {
       const availableAtTime = notAttending.filter(user => {
-        // Check availability in both games and sessions
-        const availableForGame = isUserAvailableForGame(user.id, eventDate);
-        const availableForSession = isUserAvailableForSession(user.id, eventDate);
+        // Check availability in both games and sessions with default duration
+        const availableForGame = isUserAvailableForGame(user.id, eventDate, defaultDuration);
+        const availableForSession = isUserAvailableForSession(user.id, eventDate, defaultDuration);
         return availableForGame && availableForSession;
       });
       
@@ -89,7 +92,7 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
         available: true
       })));
     }
-  }, [attendees, eventDate, users, isUserAvailableForGame, isUserAvailableForSession]);
+  }, [attendees, eventDate, users, isUserAvailableForGame, isUserAvailableForSession, defaultDuration]);
   
   // Get user objects for current attendees
   const attendeeUsers = attendees.map((attendee) => {
@@ -112,8 +115,8 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
     
     // Double-check availability if we have an event date
     if (eventDate) {
-      const isAvailableForGame = isUserAvailableForGame(selectedUserId, eventDate);
-      const isAvailableForSession = isUserAvailableForSession(selectedUserId, eventDate);
+      const isAvailableForGame = isUserAvailableForGame(selectedUserId, eventDate, defaultDuration);
+      const isAvailableForSession = isUserAvailableForSession(selectedUserId, eventDate, defaultDuration);
       
       if (!isAvailableForGame || !isAvailableForSession) {
         toast({
@@ -336,3 +339,5 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
     </Card>
   );
 };
+
+```

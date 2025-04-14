@@ -9,9 +9,12 @@ export const useAttendeeAvailability = () => {
   const checkUserAvailability = (userId: string, eventDate: string | undefined) => {
     if (!eventDate) return true;
     
-    // Check availability in both games and sessions
-    const availableForGame = isUserAvailableForGame(userId, eventDate);
-    const availableForSession = isUserAvailableForSession(userId, eventDate);
+    // Default duration of 60 minutes
+    const defaultDuration = 60;
+    
+    // Check availability in both games and sessions with the default duration
+    const availableForGame = isUserAvailableForGame(userId, eventDate, defaultDuration);
+    const availableForSession = isUserAvailableForSession(userId, eventDate, defaultDuration);
     
     return availableForGame && availableForSession;
   };
