@@ -1,5 +1,5 @@
 
-import { User } from "@/types/userTypes";
+import { User, AdminTransferLog } from "@/types/userTypes";
 import { createAdminTransferLog } from "./logService";
 import { notifySuperAdminChange } from "./notificationHelpers";
 
