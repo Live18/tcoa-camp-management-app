@@ -5,6 +5,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import UserManagement from "@/pages/admin/UserManagement";
 import UserDetail from "@/pages/admin/UserDetail";
 import UserEdit from "@/pages/admin/UserEdit";
+import AdminEdit from "@/pages/admin/AdminEdit";
 
 export const adminUserRoutes = (
   <>
@@ -29,6 +30,14 @@ export const adminUserRoutes = (
       element={
         <AuthGuard requiredRole="admin">
           <UserDetail />
+        </AuthGuard>
+      }
+    />
+    <Route
+      path="/admin/manage-admins/edit/:id"
+      element={
+        <AuthGuard requiredRole="admin">
+          <AdminEdit />
         </AuthGuard>
       }
     />
