@@ -1,6 +1,15 @@
 
 import { sendGmailEmail, generateNotificationEmail, sendSmsNotification } from "./emailService";
-import { NotificationPreference, User } from "@/contexts/UserContext";
+import { NotificationPreference } from "@/contexts/UserContext";
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  notificationPreference?: NotificationPreference;
+  [key: string]: any;
+}
 
 export interface NotificationOptions {
   title: string;
