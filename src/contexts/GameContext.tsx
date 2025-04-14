@@ -1,5 +1,10 @@
+
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { UserRole } from "./UserContext";
+import { useUser } from "./UserContext";
+import { useLocation } from "./LocationContext";
+import { sendNotification, generateGameAssignmentMessage } from "@/utils/notificationService";
+import { toast } from "@/components/ui/use-toast";
 
 export interface GameAttendee {
   userId: string;
@@ -30,6 +35,7 @@ interface GameContextType {
   getUnpublishedAttendees: () => number;
   publishAttendees: (gameId: string, attendeeIds: string[]) => void;
   resetAllGames: () => void; // Added method for end camp functionality
+  isUserAvailableAt: (userId: string, date: string, durationMinutes: number) => boolean;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -69,6 +75,8 @@ const sampleGames: Game[] = [
 
 export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [games, setGames] = useState<Game[]>(sampleGames);
+  const { users } = useUser();
+  const { getLocation } = useLocation();
 
   const addGame = (game: Omit<Game, "id">) => {
     const newGame = {
@@ -104,7 +112,40 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, 0);
   };
 
+  // Helper function to check if a user is already scheduled at a given time
+  const isUserAvailableAt = (userId: string, dateString: string, durationMinutes: number = 60) => {
+    const eventTime = new Date(dateString).getTime();
+    // Default game duration is 60 minutes
+    const eventEndTime = eventTime + (durationMinutes * 60 * 1000);
+
+    // Check all games where this user is an attendee
+    const userGames = games.filter(game => 
+      game.attendees.some(attendee => attendee.userId === userId)
+    );
+
+    // Check if any of those games overlap with the provided time
+    const hasConflict = userGames.some(game => {
+      const gameTime = new Date(game.date).getTime();
+      const gameEndTime = gameTime + (durationMinutes * 60 * 1000);
+      
+      // Check for overlap
+      return (
+        (eventTime >= gameTime && eventTime < gameEndTime) || // Event starts during an existing game
+        (eventEndTime > gameTime && eventEndTime <= gameEndTime) || // Event ends during an existing game
+        (eventTime <= gameTime && eventEndTime >= gameEndTime) // Event completely encloses an existing game
+      );
+    });
+
+    return !hasConflict;
+  };
+
   const publishAttendees = (gameId: string, attendeeIds: string[]) => {
+    const game = getGame(gameId);
+    if (!game) return;
+
+    const location = getLocation(game.locationId);
+    const locationName = location ? location.name : "Unknown Location";
+    
     setGames((prev) =>
       prev.map((game) => {
         if (game.id === gameId) {
@@ -112,6 +153,28 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             ...game,
             attendees: game.attendees.map((attendee) => {
               if (attendeeIds.includes(attendee.userId)) {
+                // Find the user to send notification
+                const user = users.find(u => u.id === attendee.userId);
+                if (user) {
+                  // Generate and send notification based on user preference
+                  const message = generateGameAssignmentMessage(
+                    game.title,
+                    game.date,
+                    locationName,
+                    game.courtNumber,
+                    attendee.role
+                  );
+                  
+                  const notificationSent = sendNotification({
+                    title: "New Game Assignment",
+                    message,
+                    user
+                  });
+                  
+                  if (notificationSent) {
+                    console.log(`Notification sent to ${user.name} about game assignment`);
+                  }
+                }
                 return { ...attendee, published: true };
               }
               return attendee;
@@ -121,6 +184,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return game;
       })
     );
+    
+    // Show a toast notification for admins
+    toast({
+      title: "Attendees Published",
+      description: `${attendeeIds.length} attendee assignments have been published with notifications sent.`
+    });
   };
 
   // Add a method to reset all games
@@ -141,6 +210,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         getUnpublishedAttendees,
         publishAttendees,
         resetAllGames,
+        isUserAvailableAt,
       }}
     >
       {children}

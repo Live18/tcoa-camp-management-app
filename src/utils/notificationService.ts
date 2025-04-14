@@ -1,0 +1,78 @@
+
+import { sendGmailEmail, generateNotificationEmail, sendSmsNotification } from "./emailService";
+import { NotificationPreference, User } from "@/contexts/UserContext";
+
+export interface NotificationOptions {
+  title: string;
+  message: string;
+  user: User;
+}
+
+/**
+ * Send a notification to a user based on their notification preferences
+ */
+export const sendNotification = ({ title, message, user }: NotificationOptions): boolean => {
+  // If no notification preference is set, don't send anything
+  if (!user.notificationPreference) {
+    console.log(`User ${user.name} has no notification preferences set. Notification not sent.`);
+    return false;
+  }
+
+  // Send notification based on user preference
+  if (user.notificationPreference === "email" && user.email) {
+    const { subject, body } = generateNotificationEmail(title, message);
+    return sendGmailEmail({
+      to: user.email,
+      subject,
+      body
+    });
+  } else if (user.notificationPreference === "sms" && user.phone) {
+    return sendSmsNotification(user.phone, `${title}: ${message}`);
+  }
+
+  console.log(`Failed to send notification to ${user.name}. Invalid preference or missing contact info.`);
+  return false;
+};
+
+/**
+ * Generate assignment notification message for a session
+ */
+export const generateSessionAssignmentMessage = (
+  sessionTitle: string, 
+  date: string, 
+  location: string,
+  role: string
+): string => {
+  const formattedDate = new Date(date).toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  return `You have been assigned as a ${role} to the session "${sessionTitle}" at ${location} on ${formattedDate}.`;
+};
+
+/**
+ * Generate assignment notification message for a game
+ */
+export const generateGameAssignmentMessage = (
+  gameTitle: string, 
+  date: string, 
+  location: string,
+  court: number,
+  role: string
+): string => {
+  const formattedDate = new Date(date).toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  return `You have been assigned as a ${role} to the game "${gameTitle}" at ${location} (Court ${court}) on ${formattedDate}.`;
+};

@@ -1,5 +1,10 @@
+
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { UserRole } from "./UserContext";
+import { useUser } from "./UserContext";
+import { useLocation } from "./LocationContext";
+import { sendNotification, generateSessionAssignmentMessage } from "@/utils/notificationService";
+import { toast } from "@/components/ui/use-toast";
 
 export interface SessionAttendee {
   userId: string;
@@ -29,7 +34,8 @@ interface ClassroomSessionContextType {
   getSessionsByLocationId: (locationId: string) => ClassroomSession[];
   getUnpublishedAttendees: () => number;
   publishAttendees: (sessionId: string, attendeeIds: string[]) => void;
-  resetAllSessions: () => void; // Added method for end camp functionality
+  resetAllSessions: () => void;
+  isUserAvailableAt: (userId: string, date: string, durationMinutes: number) => boolean;
 }
 
 const ClassroomSessionContext = createContext<ClassroomSessionContextType | undefined>(undefined);
@@ -73,6 +79,8 @@ const sampleSessions: ClassroomSession[] = [
 
 export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [sessions, setSessions] = useState<ClassroomSession[]>(sampleSessions);
+  const { users } = useUser();
+  const { getLocation } = useLocation();
 
   const addSession = (session: Omit<ClassroomSession, "id">) => {
     const newSession = {
@@ -108,7 +116,41 @@ export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ ch
     }, 0);
   };
 
+  // Helper function to check if a user is already scheduled at a given time
+  const isUserAvailableAt = (userId: string, dateString: string, durationMinutes: number = 60) => {
+    const eventTime = new Date(dateString).getTime();
+    // Default session duration is 60 minutes
+    const eventEndTime = eventTime + (durationMinutes * 60 * 1000);
+
+    // Check all sessions where this user is an attendee
+    const userSessions = sessions.filter(session => 
+      session.attendees.some(attendee => attendee.userId === userId)
+    );
+
+    // Check if any of those sessions overlap with the provided time
+    const hasConflict = userSessions.some(session => {
+      const sessionTime = new Date(session.date).getTime();
+      const sessionEndTime = sessionTime + (durationMinutes * 60 * 1000);
+      
+      // Check for overlap
+      return (
+        (eventTime >= sessionTime && eventTime < sessionEndTime) || // Event starts during an existing session
+        (eventEndTime > sessionTime && eventEndTime <= sessionEndTime) || // Event ends during an existing session
+        (eventTime <= sessionTime && eventEndTime >= sessionEndTime) // Event completely encloses an existing session
+      );
+    });
+
+    return !hasConflict;
+  };
+
   const publishAttendees = (sessionId: string, attendeeIds: string[]) => {
+    const session = getSession(sessionId);
+    if (!session) return;
+    
+    const location = getLocation(session.locationId);
+    const locationName = location ? location.name : "Unknown Location";
+    
+    // Update the attendee status to published
     setSessions((prev) =>
       prev.map((session) => {
         if (session.id === sessionId) {
@@ -116,6 +158,27 @@ export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ ch
             ...session,
             attendees: session.attendees.map((attendee) => {
               if (attendeeIds.includes(attendee.userId)) {
+                // Find the user to send notification
+                const user = users.find(u => u.id === attendee.userId);
+                if (user) {
+                  // Generate and send notification based on user preference
+                  const message = generateSessionAssignmentMessage(
+                    session.title,
+                    session.date,
+                    `${locationName} - ${session.roomName}`,
+                    attendee.role
+                  );
+                  
+                  const notificationSent = sendNotification({
+                    title: "New Session Assignment",
+                    message,
+                    user
+                  });
+                  
+                  if (notificationSent) {
+                    console.log(`Notification sent to ${user.name} about session assignment`);
+                  }
+                }
                 return { ...attendee, published: true };
               }
               return attendee;
@@ -125,6 +188,12 @@ export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ ch
         return session;
       })
     );
+    
+    // Show a toast notification for admins
+    toast({
+      title: "Attendees Published",
+      description: `${attendeeIds.length} attendee assignments have been published with notifications sent.`
+    });
   };
 
   // Add a method to reset all sessions
@@ -145,6 +214,7 @@ export const ClassroomSessionProvider: React.FC<{ children: ReactNode }> = ({ ch
         getUnpublishedAttendees,
         publishAttendees,
         resetAllSessions,
+        isUserAvailableAt,
       }}
     >
       {children}

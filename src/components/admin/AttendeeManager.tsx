@@ -1,6 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
+import { useGame } from "@/contexts/GameContext";
+import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/use-toast";
-import { PlusCircle, Check, X, UserX } from "lucide-react";
+import { PlusCircle, Check, X, UserX, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface AttendeeManagerProps {
@@ -41,6 +43,7 @@ interface AttendeeManagerProps {
   onPublishAttendees: (attendeeIds: string[]) => void;
   allowedRoles: string[];
   maxAttendees?: number;
+  eventDate?: string; // Optional date of the event for checking availability
 }
 
 export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
@@ -49,16 +52,44 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
   onRemoveAttendee,
   onPublishAttendees,
   allowedRoles,
-  maxAttendees
+  maxAttendees,
+  eventDate
 }) => {
   const { users } = useUser();
+  const { isUserAvailableAt: isUserAvailableForGame } = useGame();
+  const { isUserAvailableAt: isUserAvailableForSession } = useClassroomSession();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<string>(allowedRoles[0]);
+  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
   
-  // Get available users who are not already attendees
-  const availableUsers = users.filter(
-    (user) => !attendees.some((attendee) => attendee.userId === user.id)
-  );
+  // Update available users whenever attendees or event date changes
+  useEffect(() => {
+    // Get users who are not already attendees
+    const notAttending = users.filter(
+      (user) => !attendees.some((attendee) => attendee.userId === user.id)
+    );
+    
+    // If we have an event date, filter by availability
+    if (eventDate) {
+      const availableAtTime = notAttending.filter(user => {
+        // Check availability in both games and sessions
+        const availableForGame = isUserAvailableForGame(user.id, eventDate);
+        const availableForSession = isUserAvailableForSession(user.id, eventDate);
+        return availableForGame && availableForSession;
+      });
+      
+      setAvailableUsers(availableAtTime.map(user => ({
+        ...user,
+        available: true
+      })));
+    } else {
+      // If no date provided, all users not already attending are available
+      setAvailableUsers(notAttending.map(user => ({
+        ...user,
+        available: true
+      })));
+    }
+  }, [attendees, eventDate, users, isUserAvailableForGame, isUserAvailableForSession]);
   
   // Get user objects for current attendees
   const attendeeUsers = attendees.map((attendee) => {
@@ -77,6 +108,21 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
         variant: "destructive",
       });
       return;
+    }
+    
+    // Double-check availability if we have an event date
+    if (eventDate) {
+      const isAvailableForGame = isUserAvailableForGame(selectedUserId, eventDate);
+      const isAvailableForSession = isUserAvailableForSession(selectedUserId, eventDate);
+      
+      if (!isAvailableForGame || !isAvailableForSession) {
+        toast({
+          title: "Scheduling Conflict",
+          description: "This user is already scheduled for another event at this time.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     onAddAttendee(selectedUserId, selectedRole);
@@ -109,10 +155,6 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
     }
     
     onPublishAttendees(unpublishedAttendeeIds);
-    toast({
-      title: "Attendees Published",
-      description: "The attendee assignments have been published",
-    });
   };
 
   const roleLabel = (role: string) => {
@@ -166,8 +208,17 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
                   </SelectItem>
                 ) : (
                   availableUsers.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
+                    <SelectItem 
+                      key={user.id} 
+                      value={user.id}
+                      disabled={!user.available}
+                    >
                       {user.name} ({user.role})
+                      {!user.available && (
+                        <span className="ml-2 text-amber-500">
+                          <AlertTriangle className="inline h-3 w-3" /> Time conflict
+                        </span>
+                      )}
                     </SelectItem>
                   ))
                 )}

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
@@ -97,11 +98,6 @@ const SessionDetail = () => {
 
   const handlePublishAttendees = (attendeeIds: string[]) => {
     publishAttendees(session.id, attendeeIds);
-    
-    toast({
-      title: "Attendees Published",
-      description: `${attendeeIds.length} attendee assignments have been published.`
-    });
   };
 
   return (
@@ -168,6 +164,7 @@ const SessionDetail = () => {
               onPublishAttendees={handlePublishAttendees}
               allowedRoles={["camper", "observer", "presenter"]}
               maxAttendees={session.maxCampers}
+              eventDate={session.date}
             />
           </PermissionGate>
         </div>
