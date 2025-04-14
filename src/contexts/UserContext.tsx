@@ -4,7 +4,8 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 export type UserRole = "camper" | "observer" | "presenter" | "admin";
 export type NotificationPreference = "email" | "sms" | null;
 
-interface User {
+// Make sure to export the User interface
+export interface User {
   id: string;
   name: string;
   email: string;

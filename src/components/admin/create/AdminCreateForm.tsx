@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { UserPlus } from "lucide-react";
-import { User } from "@/contexts/UserContext";
+import { User, useUser } from "@/contexts/UserContext";
 import { toast } from "@/components/ui/use-toast";
 import { sendNotification } from "@/utils/notificationService";
 import { Form } from "@/components/ui/form";
