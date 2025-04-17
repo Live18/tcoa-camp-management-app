@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, PlusCircle } from "lucide-react";
 import { PermissionGate } from "@/components/auth/PermissionGate";
+import { PermissionAction } from "@/contexts/PermissionContext";
 
 interface ManagementPageHeaderProps {
   title: string;
   createButtonLabel: string;
-  createPermission: string;
+  createPermission: PermissionAction | PermissionAction[];
   createPath: string;
 }
 
