@@ -1,14 +1,14 @@
+
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
 import { useLocation } from "@/contexts/LocationContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Users, ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import { AttendeeManager } from "@/components/admin/AttendeeManager";
-import { toast } from "@/components/ui/use-toast";
+import SessionDetailHeader from "@/components/admin/session/SessionDetailHeader";
+import SessionDetailsCard from "@/components/admin/session/SessionDetailsCard";
+import SessionNotFound from "@/components/admin/session/SessionNotFound";
 
 const SessionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +17,6 @@ const SessionDetail = () => {
   const { getLocation } = useLocation();
   
   // Determine the path we came from to dynamically set the back button
-  // This will now properly distinguish between /admin/sessions and /admin/classroom-sessions
   const pathname = window.location.pathname;
   const isClassroomSession = pathname.includes("classroom-sessions");
   const backPath = isClassroomSession 
@@ -27,24 +26,7 @@ const SessionDetail = () => {
   const session = getSession(id || "");
   
   if (!session) {
-    return (
-      <div className="container mx-auto py-8">
-        <Button variant="ghost" onClick={() => navigate(backPath)} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back 
-        </Button>
-        <Card>
-          <CardContent className="py-8 text-center">
-            <h2 className="text-2xl font-bold mb-2">Session Not Found</h2>
-            <p className="text-muted-foreground">
-              The classroom session you're looking for doesn't exist or has been removed.
-            </p>
-            <Button onClick={() => navigate(backPath)} className="mt-4">
-              View All Sessions
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <SessionNotFound backPath={backPath} />;
   }
 
   const location = getLocation(session.locationId);
@@ -95,58 +77,20 @@ const SessionDetail = () => {
     });
   };
 
-  const handlePublishAttendees = (attendeeIds: string[]) => {
-    publishAttendees(session.id, attendeeIds);
-  };
-
   return (
     <PermissionGate action="session.view">
       <div className="container mx-auto py-6">
-        <Button variant="ghost" onClick={() => navigate(backPath)} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to {isClassroomSession ? "Classroom Sessions" : "Sessions"}
-        </Button>
+        <SessionDetailHeader 
+          backPath={backPath} 
+          isClassroomSession={isClassroomSession} 
+        />
         
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>{session.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p>{session.description}</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span>
-                      {formatDate(session.date)} at {formatTime(session.date)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span>
-                      {location ? `${location.name} - ${session.roomName}` : session.roomName}
-                    </span>
-                  </div>
-                  
-                  {location && (
-                    <div className="pl-6 text-sm text-muted-foreground">
-                      {location.address}, {location.city}, {location.state} {location.zipCode}
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span>
-                      <Badge variant="outline">{session.currentCampers} / {session.maxCampers}</Badge> campers
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <SessionDetailsCard
+          session={session}
+          location={location}
+          formatDate={formatDate}
+          formatTime={formatTime}
+        />
         
         <div className="my-8">
           <PermissionGate action="session.edit" fallback={
@@ -160,7 +104,7 @@ const SessionDetail = () => {
               attendees={session.attendees}
               onAddAttendee={handleAddAttendee}
               onRemoveAttendee={handleRemoveAttendee}
-              onPublishAttendees={handlePublishAttendees}
+              onPublishAttendees={(attendeeIds) => publishAttendees(session.id, attendeeIds)}
               allowedRoles={["camper", "observer", "presenter"]}
               maxAttendees={session.maxCampers}
               eventDate={session.date}
