@@ -1,12 +1,10 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { PermissionGate } from "@/components/auth/PermissionGate";
-import { Button } from "@/components/ui/button";
-import ClassroomSessionCreateForm from "@/components/admin/session/ClassroomSessionCreateForm";
+import SessionCreateForm from "@/components/admin/session/SessionCreateForm";
+import SessionPageHeader from "@/components/admin/session/SessionPageHeader";
 
 const ClassroomSessionCreate = () => {
-  const navigate = useNavigate();
   const backPath = "/admin/classroom-sessions";
   
   return (
@@ -15,20 +13,16 @@ const ClassroomSessionCreate = () => {
       redirectTo={backPath}
     >
       <div className="container mx-auto py-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
-          <div>
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate(backPath)}
-              className="mb-2 px-0"
-            >
-              ← Back to Classroom Sessions
-            </Button>
-            <h1 className="text-3xl font-bold">Add Classroom Session</h1>
-          </div>
-        </div>
+        <SessionPageHeader
+          title="Add Classroom Session"
+          backPath={backPath}
+          backLabel="Classroom Sessions"
+        />
 
-        <ClassroomSessionCreateForm backPath={backPath} />
+        <SessionCreateForm 
+          backPath={backPath} 
+          isClassroomSession={true}
+        />
       </div>
     </PermissionGate>
   );
