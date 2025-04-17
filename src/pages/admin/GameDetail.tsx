@@ -1,47 +1,61 @@
 
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "@/contexts/GameContext";
 import { useLocation } from "@/contexts/LocationContext";
-import { PermissionGate } from "@/components/auth/PermissionGate";
-import { AttendeeManager } from "@/components/admin/AttendeeManager";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, MapPin, Clock, UserPlus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Clock, MapPin, Users, ArrowLeft, Eye, Calendar, Trash } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { PermissionGate } from "@/components/auth/PermissionGate";
+import { AttendeeManager } from "@/components/admin/attendee-manager/AttendeeManager";
+import { toast } from "@/components/ui/use-toast";
 
 const GameDetail = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { getGame, updateGame, publishAttendees } = useGame();
+  const navigate = useNavigate();
+  const { getGame, updateGame, deleteGame, publishAttendees } = useGame();
   const { getLocation } = useLocation();
+  const [confirmDelete, setConfirmDelete] = useState(false);
   
-  const game = getGame(id!);
-  const location = game ? getLocation(game.locationId) : null;
-
+  const game = getGame(id || "");
+  
   if (!game) {
     return (
-      <div className="container mx-auto py-6">
-        <h1 className="text-3xl font-bold mb-6">Game not found</h1>
-        <Button onClick={() => navigate("/admin/games")}>
-          Back to Games
+      <div className="container mx-auto py-8">
+        <Button variant="ghost" onClick={() => navigate("/admin/games")} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Games
         </Button>
+        <Card>
+          <CardContent className="py-8 text-center">
+            <h2 className="text-2xl font-bold mb-2">Game Not Found</h2>
+            <p className="text-muted-foreground">
+              The game you're looking for doesn't exist or has been removed.
+            </p>
+            <Button onClick={() => navigate("/admin/games")} className="mt-4">
+              View All Games
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
+  const location = getLocation(game.locationId);
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, { 
-      weekday: 'long',
+      weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
@@ -56,149 +70,182 @@ const GameDetail = () => {
     });
   };
 
+  // Count observers for this game
+  const observerCount = game.attendees.filter(att => att.role === "observer").length;
+
+  // Attendee management functions
   const handleAddAttendee = (userId: string, role: string) => {
-    const newAttendee = {
-      userId,
-      role: role as any,
-      published: false,
-    };
+    const updatedAttendees = [
+      ...game.attendees,
+      { userId, role: role as any, published: false }
+    ];
     
-    // Update camper count if the new attendee is a camper
-    const newCamperCount = role === "camper" 
-      ? game.currentCampers + 1 
-      : game.currentCampers;
+    // Calculate the new current campers count
+    const campersCount = updatedAttendees.filter(a => a.role === "camper").length;
     
-    updateGame(game.id, {
-      attendees: [...game.attendees, newAttendee],
-      currentCampers: newCamperCount,
+    updateGame(game.id, { 
+      attendees: updatedAttendees,
+      currentCampers: campersCount
+    });
+
+    toast({
+      title: "Attendee Added",
+      description: `User has been added as a ${role}`,
     });
   };
 
   const handleRemoveAttendee = (userId: string) => {
-    const attendee = game.attendees.find(a => a.userId === userId);
+    const updatedAttendees = game.attendees.filter(att => att.userId !== userId);
     
-    // Reduce camper count if removing a camper
-    const newCamperCount = attendee && attendee.role === "camper" 
-      ? game.currentCampers - 1 
-      : game.currentCampers;
+    // Calculate the new current campers count
+    const campersCount = updatedAttendees.filter(a => a.role === "camper").length;
     
-    updateGame(game.id, {
-      attendees: game.attendees.filter(a => a.userId !== userId),
-      currentCampers: newCamperCount,
+    updateGame(game.id, { 
+      attendees: updatedAttendees,
+      currentCampers: campersCount 
+    });
+
+    toast({
+      title: "Attendee Removed",
+      description: "User has been removed from this game",
     });
   };
 
   const handlePublishAttendees = (attendeeIds: string[]) => {
     publishAttendees(game.id, attendeeIds);
+    toast({
+      title: "Attendees Published",
+      description: "Selected attendees have been published",
+    });
+  };
+  
+  const handleDeleteGame = () => {
+    deleteGame(game.id);
+    toast({
+      title: "Game Deleted",
+      description: "The game has been deleted successfully",
+    });
+    navigate("/admin/games");
   };
 
   return (
     <PermissionGate action="game.view">
       <div className="container mx-auto py-6">
-        <div className="mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate("/admin/games")}
-            className="px-0"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Games
-          </Button>
-          <h1 className="text-3xl font-bold">Game Details</h1>
+        <Button variant="ghost" onClick={() => navigate("/admin/games")} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Games
+        </Button>
+        
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <h1 className="text-3xl font-bold mb-2 md:mb-0">{game.title}</h1>
+          <div className="flex flex-wrap gap-2">
+            <PermissionGate action="game.edit">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate(`/admin/games/edit/${game.id}`)}
+              >
+                Edit Game
+              </Button>
+            </PermissionGate>
+            
+            <PermissionGate action="game.delete">
+              <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+                <DialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash className="mr-2 h-4 w-4" />
+                    Delete Game
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete this game? This action cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className="mt-4">
+                    <Button variant="outline" onClick={() => setConfirmDelete(false)}>Cancel</Button>
+                    <Button variant="destructive" onClick={handleDeleteGame}>Delete</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </PermissionGate>
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{game.title}</CardTitle>
-              <CardDescription>{game.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Game Details</CardTitle>
+            <CardDescription>{game.description}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <Label>Date</Label>
+                    <span>
+                      {formatDate(game.date)} 
+                    </span>
                   </div>
-                  <div className="border border-input bg-background px-3 py-2 rounded-md">
-                    {formatDate(game.date)}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
+                  
                   <div className="flex items-center">
                     <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <Label>Time</Label>
+                    <span>
+                      {formatTime(game.date)}
+                    </span>
                   </div>
-                  <div className="border border-input bg-background px-3 py-2 rounded-md">
-                    {formatTime(game.date)}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                  
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <Label>Location</Label>
+                    <span>
+                      {location ? `${location.name} - Court ${game.courtNumber}` : `Court ${game.courtNumber}`}
+                    </span>
                   </div>
-                  <div className="border border-input bg-background px-3 py-2 rounded-md">
-                    {location ? location.name : "Unknown Location"}
-                  </div>
+                  
+                  {location && (
+                    <div className="pl-6 text-sm text-muted-foreground">
+                      {location.address}, {location.city}, {location.state} {location.zipCode}
+                    </div>
+                  )}
                 </div>
                 
-                <div className="space-y-2">
-                  <Label>Court Number</Label>
-                  <div className="border border-input bg-background px-3 py-2 rounded-md">
-                    {game.courtNumber}
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>
+                      <Badge variant="outline">{game.currentCampers} / {game.maxCampers}</Badge> campers
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <Eye className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>
+                      <Badge variant="outline" className="bg-green-50 text-green-700">{observerCount}</Badge> observers
+                    </span>
                   </div>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Maximum Campers</Label>
-                  <div className="border border-input bg-background px-3 py-2 rounded-md">
-                    {game.maxCampers}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Current Campers</Label>
-                  <div className="border border-input bg-background px-3 py-2 rounded-md">
-                    {game.currentCampers}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <PermissionGate action="game.edit">
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate(`/admin/games/edit/${game.id}`)}
-                >
-                  Edit Game
-                </Button>
-              </PermissionGate>
-            </CardFooter>
-          </Card>
-          
-          <PermissionGate action="game.edit">
-            <div className="mt-2">
-              <div className="flex items-center mb-4">
-                <UserPlus className="h-5 w-5 mr-2 text-primary" />
-                <h2 className="text-xl font-bold">Manage Attendees</h2>
-              </div>
-              <Separator className="mb-6" />
-              <AttendeeManager 
-                attendees={game.attendees}
-                onAddAttendee={handleAddAttendee}
-                onRemoveAttendee={handleRemoveAttendee}
-                onPublishAttendees={handlePublishAttendees}
-                allowedRoles={["camper", "observer"]}
-                maxAttendees={game.maxCampers}
-              />
             </div>
+          </CardContent>
+        </Card>
+        
+        <div className="my-8">
+          <PermissionGate action="game.manage_attendees" fallback={
+            <Card>
+              <CardContent className="py-6">
+                <p className="text-center text-muted-foreground">You don't have permission to manage attendees.</p>
+              </CardContent>
+            </Card>
+          }>
+            <AttendeeManager 
+              attendees={game.attendees}
+              onAddAttendee={handleAddAttendee}
+              onRemoveAttendee={handleRemoveAttendee}
+              onPublishAttendees={handlePublishAttendees}
+              allowedRoles={["camper", "observer"]}
+              maxAttendees={game.maxCampers}
+              eventDate={game.date}
+            />
           </PermissionGate>
         </div>
       </div>

@@ -1,14 +1,15 @@
 
-# Classroom Session Management
+# Session Management
 
 ## Overview
 
-The Classroom Session Management system enables administrators to create, edit, and manage educational sessions within the basketball camp. Sessions typically take place in classroom settings and focus on theoretical aspects of basketball, strategy, or other educational content.
+The Session Management system allows administrators to create, edit, and manage classroom sessions within the camp. Sessions have specific locations, times, and can have various types of attendees including campers, presenters, and observers.
 
 ## Component Structure
 
 ### Page Components
-- `SessionManagement.tsx`: Main page for managing all classroom sessions
+- `ClassroomSessionManagement.tsx`: Main page for managing all classroom sessions
+- `SessionManagement.tsx`: General session management interface
 - `SessionCreate.tsx`: Page for creating new sessions
 - `SessionDetail.tsx`: Page showing detailed session information
 - `SessionEdit.tsx`: Page for editing session details
@@ -24,22 +25,22 @@ The Classroom Session Management system enables administrators to create, edit, 
 
 1. **Navigate to Session Management**
    - Go to the Admin Dashboard
-   - Click on "Sessions" in the navigation menu
-   - Click "Add Session" button
+   - Click on "Classroom Sessions" in the navigation menu
+   - Click "Create Session" button
 
 2. **Fill in Session Details**
-   - Title: Name or topic of the session
-   - Description: Detailed information about the session content
+   - Title: Name or identifier for the session
+   - Description: Details about the session's purpose or activities
    - Date and Time: When the session is scheduled
    - Location: Where the session will take place
-   - Room: Specific room for the session
-   - Maximum Number of Attendees: Attendance limit
-   - Materials: Any required materials for the session
+   - Room Name/Number: Specific room for the session
+   - Maximum Number of Campers: Attendance limit
 
 3. **Assign Participants (Optional)**
    - Assign presenters who will lead the session
    - Assign observers who will watch the session
-   - Assign campers who will attend the session
+   - Assign campers who will participate in the session
+   - Note: Campers cannot be assigned as presenters or observers
 
 4. **Save the Session**
    - Click "Create Session" to save the new session
@@ -76,10 +77,38 @@ The Classroom Session Management system enables administrators to create, edit, 
      - Add observers to the session
      - Remove attendees from the session
 
-3. **Handling Conflicts**
+3. **Role Restrictions**
+   - Campers cannot be assigned as presenters or observers
+   - The system enforces these role restrictions
+   - Role-ineligible users are not selectable for incompatible roles
+
+4. **Handling Conflicts**
    - System checks for scheduling conflicts
    - Users cannot be assigned to multiple sessions at the same time
    - Warning displayed if conflicts are detected
+
+## Presenter Management
+
+Classroom sessions can have designated presenters who lead the session:
+
+1. **Viewing Presenter Count**
+   - The Session Management list shows the number of presenters for each session
+   - The Session Detail page also displays presenter count
+
+2. **Adding Presenters**
+   - Presenters can only be staff with appropriate roles (not campers)
+   - Navigate to the Session Detail page
+   - Use the Attendee Manager to add presenters
+   - Select "Presenter" as the role when adding attendees
+
+3. **Presenter Permissions**
+   - Presenters have access to view and interact with session details
+   - They can see session information and attendees
+   - They cannot modify session details or attendees unless they have admin privileges
+
+4. **Publishing Presenter Assignments**
+   - Presenter assignments must be published before users can see them
+   - Use the "Publish Assignments" functionality to make them visible to users
 
 ## Session Context
 
@@ -98,14 +127,15 @@ The `ClassroomSessionContext` provides access to session data and methods throug
 ## Best Practices
 
 1. **Session Scheduling**
-   - Avoid scheduling sessions during meal times
-   - Balance classroom time with on-court activities
-   - Consider the age and attention span of campers when setting session lengths
+   - Avoid scheduling multiple sessions at the same location and time
+   - Consider travel time when scheduling consecutive sessions
+   - Leave buffer time between sessions for transition
 
-2. **Content Management**
-   - Ensure session content is age-appropriate
-   - Include interactive elements in longer sessions
-   - Provide materials in advance to presenters
+2. **Attendee Management**
+   - Check for scheduling conflicts before assigning attendees
+   - Balance the number of campers across sessions
+   - Ensure appropriate presenter-to-camper ratios
+   - Never assign campers as presenters or observers
 
 3. **Permissions**
    - Use `PermissionGate` with the appropriate session permissions:

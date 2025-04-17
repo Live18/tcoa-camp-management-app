@@ -1,6 +1,5 @@
 
-import React from "react";
-import { Button } from "@/components/ui/button";
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -9,11 +8,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Check, X, UserX } from "lucide-react";
 
-type AttendeeListProps = {
+interface AttendeeListProps {
   attendees: Array<{
     userId: string;
     role: string;
@@ -23,15 +23,15 @@ type AttendeeListProps = {
   roleLabel: (role: string) => { label: string; className: string };
   handleRemoveAttendee: (userId: string) => void;
   getInitials: (name: string) => string;
-};
+}
 
 export const AttendeeList: React.FC<AttendeeListProps> = ({
   attendees,
   roleLabel,
   handleRemoveAttendee,
-  getInitials
+  getInitials,
 }) => {
-  if (!attendees || attendees.length === 0) {
+  if (attendees.length === 0) {
     return (
       <div className="text-center py-6">
         <div className="mx-auto bg-gray-100 rounded-full w-12 h-12 flex items-center justify-center mb-4">
@@ -102,3 +102,5 @@ export const AttendeeList: React.FC<AttendeeListProps> = ({
     </Table>
   );
 };
+
+export default AttendeeList;

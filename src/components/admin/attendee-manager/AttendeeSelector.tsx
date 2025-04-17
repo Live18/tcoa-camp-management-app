@@ -1,19 +1,20 @@
 
-import React from "react";
-import { Button } from "@/components/ui/button";
-import {
+import React from 'react';
+import { useUser } from "@/contexts/UserContext";
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { PlusCircle, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface AttendeeSelectorProps {
   selectedUserId: string;
-  setSelectedUserId: (id: string) => void;
+  setSelectedUserId: (userId: string) => void;
   selectedRole: string;
   setSelectedRole: (role: string) => void;
   availableUsers: any[];
@@ -36,12 +37,31 @@ export const AttendeeSelector: React.FC<AttendeeSelectorProps> = ({
   handleAddAttendee,
   roleLabel,
 }) => {
-  const isMaxCampersReached = maxAttendees && currentCamperCount >= maxAttendees;
+  const { users } = useUser();
   
+  // Filter users who are not eligible for the selected role
+  // Campers cannot be assigned as observers or presenters
+  const isRoleEligible = (user: any, role: string) => {
+    if ((role === "observer" || role === "presenter") && user.role === "camper") {
+      return false;
+    }
+    return true;
+  };
+
+  // When role changes, check if the selected user is eligible for the new role
+  React.useEffect(() => {
+    if (selectedUserId) {
+      const user = users.find(u => u.id === selectedUserId);
+      if (user && !isRoleEligible(user, selectedRole)) {
+        setSelectedUserId(""); // Clear the selection if user isn't eligible for the role
+      }
+    }
+  }, [selectedRole, selectedUserId, users, setSelectedUserId]);
+
   return (
-    <>
-      {isMaxCampersReached && (
-        <Alert className="bg-amber-50">
+    <div>
+      {maxAttendees && currentCamperCount >= maxAttendees && (
+        <Alert className="bg-amber-50 mb-4">
           <AlertDescription>
             Maximum number of campers ({maxAttendees}) has been reached
           </AlertDescription>
@@ -63,20 +83,30 @@ export const AttendeeSelector: React.FC<AttendeeSelectorProps> = ({
                   No available users
                 </SelectItem>
               ) : (
-                availableUsers.map((user) => (
-                  <SelectItem 
-                    key={user.id} 
-                    value={user.id}
-                    disabled={!user.available}
-                  >
-                    {user.name} ({user.role})
-                    {!user.available && (
-                      <span className="ml-2 text-amber-500">
-                        <AlertTriangle className="inline h-3 w-3" /> Time conflict
-                      </span>
-                    )}
-                  </SelectItem>
-                ))
+                availableUsers.map((user) => {
+                  // Check if the user is eligible for the selected role
+                  const eligible = isRoleEligible(user, selectedRole);
+                  
+                  return (
+                    <SelectItem 
+                      key={user.id} 
+                      value={user.id}
+                      disabled={!user.available || !eligible}
+                    >
+                      {user.name} ({user.role})
+                      {!user.available && (
+                        <span className="ml-2 text-amber-500">
+                          <AlertTriangle className="inline h-3 w-3" /> Time conflict
+                        </span>
+                      )}
+                      {!eligible && (
+                        <span className="ml-2 text-red-500">
+                          <AlertTriangle className="inline h-3 w-3" /> Invalid role assignment
+                        </span>
+                      )}
+                    </SelectItem>
+                  );
+                })
               )}
             </SelectContent>
           </Select>
@@ -102,13 +132,18 @@ export const AttendeeSelector: React.FC<AttendeeSelectorProps> = ({
         
         <Button 
           onClick={handleAddAttendee}
-          disabled={!selectedUserId || (maxAttendees && selectedRole === "camper" && currentCamperCount >= maxAttendees)}
+          disabled={
+            !selectedUserId || 
+            (maxAttendees && selectedRole === "camper" && currentCamperCount >= maxAttendees)
+          }
           className="whitespace-nowrap"
         >
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Attendee
         </Button>
       </div>
-    </>
+    </div>
   );
 };
+
+export default AttendeeSelector;

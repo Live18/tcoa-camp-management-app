@@ -1,18 +1,10 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
 import { useLocation } from "@/contexts/LocationContext";
-import { PermissionGate } from "@/components/auth/PermissionGate";
-import { toast } from "@/components/ui/use-toast";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,41 +13,52 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Plus, MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { PlusCircle, Edit, Search, Calendar, MapPin, Users, Presentation } from "lucide-react";
+import { PermissionGate } from "@/components/auth/PermissionGate";
 
 const ClassroomSessionManagement = () => {
   const navigate = useNavigate();
-  const { sessions, deleteSession } = useClassroomSession();
-  const { getLocation } = useLocation();
-  
+  const { sessions } = useClassroomSession();
+  const { locations } = useLocation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [locationFilter, setLocationFilter] = useState<string>("all");
+  const [showPastSessions, setShowPastSessions] = useState(false);
+
+  // Filter sessions based on search term, location, and date
+  const filteredSessions = sessions.filter((session) => {
+    const matchesSearch = session.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesLocation = locationFilter === "all" || session.locationId === locationFilter;
+    
+    // Filter out past sessions unless showPastSessions is true
+    const sessionDate = new Date(session.date);
+    const isUpcoming = sessionDate >= new Date() || showPastSessions;
+    
+    return matchesSearch && matchesLocation && isUpcoming;
+  });
+
+  // Sort sessions by date
+  const sortedSessions = [...filteredSessions].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
     });
   };
-  
+
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString(undefined, { 
@@ -64,142 +67,135 @@ const ClassroomSessionManagement = () => {
     });
   };
 
-  const handleDelete = (id: string, title: string) => {
-    deleteSession(id);
-    toast({
-      title: "Session Deleted",
-      description: `${title} has been deleted.`,
-    });
+  const getLocationName = (locationId: string) => {
+    const location = locations.find(loc => loc.id === locationId);
+    return location ? location.name : "Unknown Location";
+  };
+
+  // Count presenters for a session
+  const countPresenters = (session: any) => {
+    return session.attendees.filter(att => att.role === "presenter").length;
   };
 
   return (
     <PermissionGate action="session.view">
       <div className="container mx-auto py-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
-          <div>
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate("/admin")}
-              className="mb-2 px-0"
-            >
-              ← Back to Dashboard
-            </Button>
-            <h1 className="text-3xl font-bold">Classroom Session Management</h1>
-          </div>
-          
-          <PermissionGate action="session.create" fallback={null}>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Classroom Session Management</h1>
+          <PermissionGate action="session.create">
             <Button onClick={() => navigate("/admin/classroom-sessions/new")}>
-              <Plus className="h-4 w-4 mr-2" /> Add Session
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create Session
             </Button>
           </PermissionGate>
         </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Classroom Sessions</CardTitle>
-            <CardDescription>
-              Manage all classroom sessions
-            </CardDescription>
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="flex items-center space-x-4 w-full md:w-auto">
+                <div className="relative flex-1 md:w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search sessions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+                <Select
+                  value={locationFilter}
+                  onValueChange={setLocationFilter}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    {locations.map(location => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="showPastSessions"
+                  checked={showPastSessions}
+                  onChange={() => setShowPastSessions(!showPastSessions)}
+                  className="mr-2"
+                />
+                <label htmlFor="showPastSessions">Show Past Sessions</label>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            {sessions.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead className="text-right">Campers</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sessions.map((session) => {
-                    const location = getLocation(session.locationId);
-                    return (
-                      <TableRow key={session.id} className="group">
-                        <TableCell className="font-medium">
-                          <Button 
-                            variant="link" 
-                            className="p-0 h-auto font-medium text-foreground hover:text-primary justify-start"
-                            onClick={() => navigate(`/classroom-sessions/${session.id}`)}
-                          >
-                            {session.title}
-                          </Button>
-                        </TableCell>
-                        <TableCell>
-                          {location ? location.name : "Unknown"} - {session.roomName}
-                        </TableCell>
-                        <TableCell>{formatDate(session.date)}</TableCell>
-                        <TableCell>{formatTime(session.date)}</TableCell>
-                        <TableCell className="text-right">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Session Title</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead className="text-center">Campers</TableHead>
+                  <TableHead className="text-center">Presenters</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedSessions.length > 0 ? (
+                  sortedSessions.map((session) => (
+                    <TableRow key={session.id}>
+                      <TableCell className="font-medium">{session.title}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                          {formatDate(session.date)} at {formatTime(session.date)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                          {getLocationName(session.locationId)} - Room {session.roomName}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="flex items-center justify-center w-20 mx-auto">
+                          <Users className="h-3 w-3 mr-1" />
                           {session.currentCampers} / {session.maxCampers}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => navigate(`/classroom-sessions/${session.id}`)}>
-                                <Eye className="h-4 w-4 mr-2" /> View
-                              </DropdownMenuItem>
-                              <PermissionGate action="session.edit" fallback={null}>
-                                <DropdownMenuItem onClick={() => navigate(`/admin/classroom-sessions/edit/${session.id}`)}>
-                                  <Pencil className="h-4 w-4 mr-2" /> Edit
-                                </DropdownMenuItem>
-                              </PermissionGate>
-                              <PermissionGate action="session.delete" fallback={null}>
-                                <DropdownMenuSeparator />
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                      <Trash2 className="h-4 w-4 mr-2" /> Delete
-                                    </DropdownMenuItem>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        This will permanently delete the session "{session.title}".
-                                        This action cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => handleDelete(session.id, session.title)}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </PermissionGate>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-muted-foreground">No classroom sessions found</p>
-                <PermissionGate action="session.create" fallback={null}>
-                  <Button onClick={() => navigate("/admin/classroom-sessions/new")} className="mt-4">
-                    <Plus className="h-4 w-4 mr-2" /> Add Session
-                  </Button>
-                </PermissionGate>
-              </div>
-            )}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 flex items-center justify-center w-12 mx-auto">
+                          <Presentation className="h-3 w-3 mr-1" />
+                          {countPresenters(session)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <PermissionGate action="session.edit">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/admin/classroom-sessions/${session.id}`)}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Manage
+                          </Button>
+                        </PermissionGate>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      No classroom sessions found. {locationFilter !== "all" && "Try changing the location filter."}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
