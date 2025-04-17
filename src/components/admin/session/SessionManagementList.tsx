@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ClassroomSession } from "@/contexts/ClassroomSessionContext";
+import { ClassroomSession } from "@/types/sessionTypes";
 import { Location } from "@/contexts/LocationContext";
 import { Button } from "@/components/ui/button";
 import {

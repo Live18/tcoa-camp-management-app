@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -13,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Calendar, MapPin, Users, Presentation } from "lucide-react";
 import { PermissionGate } from "@/components/auth/PermissionGate";
-import { ClassroomSession } from "@/contexts/ClassroomSessionContext";
+import { ClassroomSession } from "@/types/sessionTypes";
 
 interface SessionListProps {
   sessions: ClassroomSession[];
