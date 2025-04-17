@@ -1,4 +1,3 @@
-
 # Session Management
 
 ## Overview
@@ -93,7 +92,8 @@ Classroom sessions can have designated presenters who lead the session:
 
 1. **Viewing Presenter Count**
    - The Session Management list shows the number of presenters for each session
-   - The Session Detail page also displays presenter count
+   - A new column has been added to display the number of presenters
+   - Presenters are displayed with a blue badge in the list view
 
 2. **Adding Presenters**
    - Presenters can only be staff with appropriate roles (not campers)
@@ -101,14 +101,20 @@ Classroom sessions can have designated presenters who lead the session:
    - Use the Attendee Manager to add presenters
    - Select "Presenter" as the role when adding attendees
 
-3. **Presenter Permissions**
-   - Presenters have access to view and interact with session details
-   - They can see session information and attendees
-   - They cannot modify session details or attendees unless they have admin privileges
+## Observer Management
 
-4. **Publishing Presenter Assignments**
-   - Presenter assignments must be published before users can see them
-   - Use the "Publish Assignments" functionality to make them visible to users
+Classroom sessions can also have observers:
+
+1. **Viewing Observer Count**
+   - The Session Management list now includes a dedicated column for observers
+   - Observers are displayed with a green badge in the list view
+   - This allows quick visibility into the number of observers for each session
+
+2. **Adding Observers**
+   - Observers can be staff members who want to watch the session
+   - Cannot be assigned from the camper pool
+   - Use the Attendee Manager to add observers
+   - Select "Observer" as the role when adding attendees
 
 ## Session Context
 
@@ -144,3 +150,4 @@ The `ClassroomSessionContext` provides access to session data and methods throug
      - `session.edit`: For editing existing sessions
      - `session.delete`: For deleting sessions
      - `session.manage_attendees`: For managing session attendees
+
