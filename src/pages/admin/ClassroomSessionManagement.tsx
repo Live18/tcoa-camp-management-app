@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Edit, Search, Calendar, MapPin, Users, Presentation } from "lucide-react";
+import { PlusCircle, Edit, Search, Calendar, MapPin, Users, Presentation, ArrowLeft } from "lucide-react";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 
 const ClassroomSessionManagement = () => {
@@ -80,8 +80,17 @@ const ClassroomSessionManagement = () => {
   return (
     <PermissionGate action="session.view">
       <div className="container mx-auto py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Classroom Session Management</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate("/admin")}
+              className="px-0"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
+            </Button>
+            <h1 className="text-2xl font-bold">Classroom Session Management</h1>
+          </div>
           <PermissionGate action="session.create">
             <Button onClick={() => navigate("/admin/classroom-sessions/new")}>
               <PlusCircle className="mr-2 h-4 w-4" />

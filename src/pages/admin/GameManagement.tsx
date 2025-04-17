@@ -13,13 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -29,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Edit, Search, Calendar, MapPin, Users, Eye } from "lucide-react";
+import { PlusCircle, Edit, Search, Calendar, MapPin, Users, Eye, ArrowLeft } from "lucide-react";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 
 const GameManagement = () => {
@@ -87,8 +80,17 @@ const GameManagement = () => {
   return (
     <PermissionGate action="game.view">
       <div className="container mx-auto py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Game Management</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate("/admin")}
+              className="px-0"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
+            </Button>
+            <h1 className="text-2xl font-bold">Game Management</h1>
+          </div>
           <PermissionGate action="game.create">
             <Button onClick={() => navigate("/admin/games/new")}>
               <PlusCircle className="mr-2 h-4 w-4" />
