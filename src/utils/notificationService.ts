@@ -62,15 +62,18 @@ export const storeNotification = async (
   type: string = "general"
 ): Promise<boolean> => {
   try {
+    // Use explicit type for the notification object to avoid TypeScript errors
+    const notification = {
+      user_id: userId,
+      title,
+      message,
+      type,
+      status: "unread"
+    };
+
     const { error } = await supabase
       .from("notifications")
-      .insert({
-        user_id: userId,
-        title,
-        message,
-        type,
-        status: "unread"
-      });
+      .insert(notification);
       
     if (error) {
       console.error("Failed to store notification:", error);
