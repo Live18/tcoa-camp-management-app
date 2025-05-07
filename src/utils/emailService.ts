@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 
 type EmailOptions = {
   to: string;
@@ -32,12 +33,49 @@ export const sendGmailEmail = ({ to, subject, body, from }: EmailOptions): boole
 };
 
 /**
- * This function will be updated to use Resend when configuration is complete
- * Currently falls back to the Gmail mailto method
+ * Send an email using the Resend API via Supabase Edge Function
+ * This is the primary email sending method
  */
-export const sendEmail = (options: EmailOptions): boolean => {
-  console.log("Using temporary email solution. Resend integration pending.");
-  return sendGmailEmail(options);
+export const sendResendEmail = async ({ to, subject, body, from }: EmailOptions): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('send-email', {
+      body: { to, subject, body, from }
+    });
+    
+    if (error) {
+      console.error("Error calling send-email function:", error);
+      return false;
+    }
+    
+    console.log("Email sent successfully via Resend");
+    return true;
+  } catch (error) {
+    console.error("Exception in sendResendEmail:", error);
+    return false;
+  }
+};
+
+/**
+ * Send an email using the best available method
+ * Tries Resend first, falls back to Gmail mailto if that fails
+ */
+export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
+  try {
+    // Try to send via Resend first
+    const result = await sendResendEmail(options);
+    
+    if (result) {
+      return true;
+    }
+    
+    // Fall back to Gmail mailto if Resend fails
+    console.log("Resend email failed, falling back to Gmail mailto");
+    return sendGmailEmail(options);
+  } catch (error) {
+    console.error("Error in sendEmail:", error);
+    // Final fallback - try Gmail mailto
+    return sendGmailEmail(options);
+  }
 };
 
 /**

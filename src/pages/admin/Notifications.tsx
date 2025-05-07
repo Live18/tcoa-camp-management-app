@@ -41,7 +41,8 @@ import {
   User, 
   Calendar 
 } from "lucide-react";
-import { sendGmailEmail } from "@/utils/emailService";
+import { sendEmail } from "@/utils/emailService";
+import { storeNotification } from "@/utils/notificationService";
 
 // Type for notification history
 interface NotificationHistory {
@@ -74,6 +75,7 @@ const Notifications = () => {
     admin: true,
   });
   const [deliveryMethod, setDeliveryMethod] = useState<"email" | "sms" | "both">("both");
+  const [sending, setSending] = useState(false);
   
   // Sample notification history
   const [notificationHistory, setNotificationHistory] = useState<NotificationHistory[]>([
@@ -129,7 +131,7 @@ const Notifications = () => {
   };
   
   // Handle sending notification
-  const handleSendNotification = (e: React.FormEvent) => {
+  const handleSendNotification = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim()) {
@@ -160,55 +162,71 @@ const Notifications = () => {
       return;
     }
     
-    // In a real app, we would send notifications here
-    // For now, we'll just demonstrate email with the first recipient
+    setSending(true);
     
-    if (deliveryMethod === "email" || deliveryMethod === "both") {
-      const emailUsers = recipients.filter(user => 
-        user.notificationPreference === "email" || user.notificationPreference === null
-      );
-      
-      if (emailUsers.length > 0) {
-        // Demo: Just open email compose window for the first user
-        sendGmailEmail({
-          to: emailUsers[0].email,
-          subject: title,
-          body: `${message}\n\nNote: This is a camp notification. In a production system, this would be sent to all ${emailUsers.length} recipients.`
-        });
+    try {
+      // For demo purposes, only send to the first recipient but show a message about the full recipient list
+      if (deliveryMethod === "email" || deliveryMethod === "both") {
+        const emailUsers = recipients.filter(user => 
+          user.notificationPreference === "email" || user.notificationPreference === null
+        );
+        
+        if (emailUsers.length > 0) {
+          // Send email to first user and store notifications for all users
+          await sendEmail({
+            to: emailUsers[0].email,
+            subject: title,
+            body: `${message}\n\nNote: This is a camp notification. In a production system, this would be sent to all ${emailUsers.length} recipients.`
+          });
+          
+          // Store notifications for all users (normally we'd loop and send to each)
+          for (const user of emailUsers) {
+            await storeNotification(user.id, title, message);
+          }
+        }
       }
+      
+      // Add to notification history
+      const { emailCount, smsCount, totalCount } = getRecipientCounts();
+      
+      const sentTo = Object.entries(selectedRoles)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([role, _]) => role)
+        .join(", ");
+      
+      const newNotification: NotificationHistory = {
+        id: (notificationHistory.length + 1).toString(),
+        title,
+        message,
+        sentAt: new Date(),
+        sentTo: sentTo === "camper,presenter,observer,admin" ? "All users" : `All ${sentTo}s`,
+        sentVia: deliveryMethod === "both" 
+          ? "Email & SMS" 
+          : deliveryMethod === "email" ? "Email" : "SMS",
+        recipientCount: totalCount
+      };
+      
+      setNotificationHistory([newNotification, ...notificationHistory]);
+      
+      // Show success message
+      toast({
+        title: "Notification Sent",
+        description: `Your notification has been sent to ${totalCount} recipients.`,
+      });
+      
+      // Reset form
+      setTitle("");
+      setMessage("");
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      toast({
+        title: "Error Sending Notification",
+        description: "There was a problem sending the notification. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSending(false);
     }
-    
-    // Add to notification history
-    const { emailCount, smsCount, totalCount } = getRecipientCounts();
-    
-    const sentTo = Object.entries(selectedRoles)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([role, _]) => role)
-      .join(", ");
-    
-    const newNotification: NotificationHistory = {
-      id: (notificationHistory.length + 1).toString(),
-      title,
-      message,
-      sentAt: new Date(),
-      sentTo: sentTo === "camper,presenter,observer,admin" ? "All users" : `All ${sentTo}s`,
-      sentVia: deliveryMethod === "both" 
-        ? "Email & SMS" 
-        : deliveryMethod === "email" ? "Email" : "SMS",
-      recipientCount: totalCount
-    };
-    
-    setNotificationHistory([newNotification, ...notificationHistory]);
-    
-    // Show success message
-    toast({
-      title: "Notification Sent",
-      description: `Your notification has been sent to ${totalCount} recipients.`,
-    });
-    
-    // Reset form
-    setTitle("");
-    setMessage("");
   };
   
   const { emailCount, smsCount, totalCount } = getRecipientCounts();
@@ -348,10 +366,22 @@ const Notifications = () => {
               <Button 
                 type="submit" 
                 className="w-full md:w-auto"
-                disabled={!title || !message || totalCount === 0}
+                disabled={!title || !message || totalCount === 0 || sending}
               >
-                <SendHorizonal className="mr-2 h-4 w-4" />
-                Send Notification
+                {sending ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </span>
+                ) : (
+                  <>
+                    <SendHorizonal className="mr-2 h-4 w-4" />
+                    Send Notification
+                  </>
+                )}
               </Button>
             </form>
           </CardContent>

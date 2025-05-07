@@ -21,23 +21,30 @@ export interface NotificationOptions {
 /**
  * Send a notification to a user based on their notification preferences
  */
-export const sendNotification = ({ title, message, user }: NotificationOptions): boolean => {
+export const sendNotification = async ({ title, message, user }: NotificationOptions): Promise<boolean> => {
   // If no notification preference is set, don't send anything
   if (!user.notificationPreference) {
     console.log(`User ${user.name} has no notification preferences set. Notification not sent.`);
     return false;
   }
 
-  // Send notification based on user preference
-  if (user.notificationPreference === "email" && user.email) {
-    const { subject, body } = generateNotificationEmail(title, message);
-    return sendEmail({
-      to: user.email,
-      subject,
-      body
-    });
-  } else if (user.notificationPreference === "sms" && user.phone) {
-    return sendSmsNotification(user.phone, `${title}: ${message}`);
+  try {
+    // Store notification in database first
+    await storeNotification(user.id, title, message);
+    
+    // Send notification based on user preference
+    if (user.notificationPreference === "email" && user.email) {
+      const { subject, body } = generateNotificationEmail(title, message);
+      return await sendEmail({
+        to: user.email,
+        subject,
+        body
+      });
+    } else if (user.notificationPreference === "sms" && user.phone) {
+      return sendSmsNotification(user.phone, `${title}: ${message}`);
+    }
+  } catch (error) {
+    console.error("Error sending notification:", error);
   }
 
   console.log(`Failed to send notification to ${user.name}. Invalid preference or missing contact info.`);
