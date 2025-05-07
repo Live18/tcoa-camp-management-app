@@ -9,8 +9,10 @@ type EmailOptions = {
 /**
  * Send an email using the Gmail API
  * This function opens a composed email in the user's Gmail account,
- * which is the simplest way to integrate Gmail without requiring
+ * which is the simplest way to integrate without requiring
  * complex OAuth2 setup on the client side.
+ * 
+ * NOTE: This is a temporary solution until Resend integration is complete
  */
 export const sendGmailEmail = ({ to, subject, body, from }: EmailOptions): boolean => {
   try {
@@ -27,6 +29,15 @@ export const sendGmailEmail = ({ to, subject, body, from }: EmailOptions): boole
     console.error("Error opening email client:", error);
     return false;
   }
+};
+
+/**
+ * This function will be updated to use Resend when configuration is complete
+ * Currently falls back to the Gmail mailto method
+ */
+export const sendEmail = (options: EmailOptions): boolean => {
+  console.log("Using temporary email solution. Resend integration pending.");
+  return sendGmailEmail(options);
 };
 
 /**

@@ -1,6 +1,7 @@
 
-import { sendGmailEmail, generateNotificationEmail, sendSmsNotification } from "./emailService";
+import { sendEmail, generateNotificationEmail, sendSmsNotification } from "./emailService";
 import { NotificationPreference } from "@/contexts/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface User {
   id: string;
@@ -30,7 +31,7 @@ export const sendNotification = ({ title, message, user }: NotificationOptions):
   // Send notification based on user preference
   if (user.notificationPreference === "email" && user.email) {
     const { subject, body } = generateNotificationEmail(title, message);
-    return sendGmailEmail({
+    return sendEmail({
       to: user.email,
       subject,
       body
@@ -41,6 +42,39 @@ export const sendNotification = ({ title, message, user }: NotificationOptions):
 
   console.log(`Failed to send notification to ${user.name}. Invalid preference or missing contact info.`);
   return false;
+};
+
+/**
+ * Store a notification in the Supabase database
+ * This will be used alongside external notifications (email/SMS)
+ */
+export const storeNotification = async (
+  userId: string,
+  title: string,
+  message: string,
+  type: string = "general"
+): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from("notifications")
+      .insert({
+        user_id: userId,
+        title,
+        message,
+        type,
+        status: "unread"
+      });
+      
+    if (error) {
+      console.error("Failed to store notification:", error);
+      return false;
+    }
+    
+    return true;
+  } catch (err) {
+    console.error("Error storing notification:", err);
+    return false;
+  }
 };
 
 /**
