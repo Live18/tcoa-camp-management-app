@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUser, UserRole, NotificationPreference } from "@/contexts/UserContext";
@@ -283,7 +282,7 @@ const UserEdit = () => {
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="" id="notification-none" />
-                            <Label htmlFor="notification-none">No notifications</Label>
+                            <Label htmlFor="notification-none">No notifications (Disabled)</Label>
                           </div>
                         </RadioGroup>
                       </FormControl>

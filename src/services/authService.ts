@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@/types/userTypes";
+import { User, NotificationPreference, UserRole } from "@/types/userTypes";
 import { toast } from "@/components/ui/use-toast";
 
 export interface AuthResponse {
@@ -32,7 +32,7 @@ export const signInWithEmail = async (
     return {
       success: true,
       message: "Signed in successfully",
-      user: data.user,
+      user: data.user as unknown as User,
     };
   } catch (error) {
     console.error("Error signing in:", error);
@@ -76,7 +76,7 @@ export const signUpWithEmail = async (
     return {
       success: true,
       message: "Signed up successfully",
-      user: data.user,
+      user: data.user as unknown as User,
     };
   } catch (error) {
     console.error("Error signing up:", error);
@@ -126,13 +126,13 @@ export const getUserProfile = async (userId: string): Promise<User | null> => {
       id: data.id,
       name: data.name,
       email: data.email,
-      role: data.role,
+      role: data.role as UserRole,
       isAdmin: data.is_admin,
       isSuperAdmin: data.is_super_admin,
       phone: data.phone,
       photoUrl: data.photo_url,
       bio: data.bio,
-      notificationPreference: data.notification_preference,
+      notificationPreference: data.notification_preference as NotificationPreference,
     };
   } catch (error) {
     console.error("Error fetching user profile:", error);

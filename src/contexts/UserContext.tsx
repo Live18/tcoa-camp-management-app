@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { User } from "@/types/userTypes";
+import { User, UserRole, NotificationPreference } from "@/types/userTypes";
 import { 
   transferSuperAdminStatus as transferSuperAdmin,
   grantSuperAdminStatus as grantSuperAdmin,
@@ -97,13 +97,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          role: user.role as UserRole,
           isAdmin: user.is_admin,
           isSuperAdmin: user.is_super_admin,
           phone: user.phone || undefined,
           photoUrl: user.photo_url || undefined,
           bio: user.bio || undefined,
-          notificationPreference: user.notification_preference || null,
+          notificationPreference: user.notification_preference as NotificationPreference || null,
         }));
         
         setUsers(formattedUsers);

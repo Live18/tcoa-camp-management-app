@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useUser, NotificationPreference } from "@/contexts/UserContext";
 import {
@@ -255,7 +254,7 @@ const Profile = () => {
                 <div className="space-y-2">
                   <Label htmlFor="notification-preference">Notification Preferences</Label>
                   <Select
-                    value={formData.notificationPreference === null ? "none" : formData.notificationPreference}
+                    value={formData.notificationPreference === null ? "none" : formData.notificationPreference || "none"}
                     onValueChange={handleNotificationChange}
                   >
                     <SelectTrigger id="notification-preference" className="w-full">
@@ -277,13 +276,13 @@ const Profile = () => {
                       <SelectItem value="none" className="flex items-center">
                         <div className="flex items-center gap-2">
                           <Bell size={16} className="text-gray-400" />
-                          <span>No notifications</span>
+                          <span>No notifications (Disabled)</span>
                         </div>
                       </SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Choose how you'd like to receive updates about assignments and camp activities.
+                    Select "No notifications" to disable all notifications including email.
                   </p>
                 </div>
                 
