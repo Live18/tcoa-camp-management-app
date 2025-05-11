@@ -9,18 +9,228 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      attendees: {
+        Row: {
+          created_at: string
+          game_id: string | null
+          id: string
+          published: boolean | null
+          role: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id?: string | null
+          id?: string
+          published?: boolean | null
+          role: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string | null
+          id?: string
+          published?: boolean | null
+          role?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendees_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendees_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "classroom_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classroom_sessions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date: string
+          description: string | null
+          id: string
+          location_id: string | null
+          max_attendees: number | null
+          room_name: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          location_id?: string | null
+          max_attendees?: number | null
+          room_name: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          location_id?: string | null
+          max_attendees?: number | null
+          room_name?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      games: {
+        Row: {
+          court_number: number
+          created_at: string
+          created_by: string | null
+          date: string
+          description: string | null
+          id: string
+          location_id: string | null
+          max_players: number | null
+          title: string
+        }
+        Insert: {
+          court_number: number
+          created_at?: string
+          created_by?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          location_id?: string | null
+          max_players?: number | null
+          title: string
+        }
+        Update: {
+          court_number?: number
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          location_id?: string | null
+          max_players?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      locations: {
+        Row: {
+          address: string
+          city: string
+          courts: number | null
+          created_at: string
+          id: string
+          name: string
+          rooms: number | null
+          state: string
+          zip: string
+        }
+        Insert: {
+          address: string
+          city: string
+          courts?: number | null
+          created_at?: string
+          id?: string
+          name: string
+          rooms?: number | null
+          state: string
+          zip: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          courts?: number | null
+          created_at?: string
+          id?: string
+          name?: string
+          rooms?: number | null
+          state?: string
+          zip?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
           id: number
+          message: string
+          status: string
+          title: string
+          type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: number
+          message?: string
+          status?: string
+          title?: string
+          type?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: number
+          message?: string
+          status?: string
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string
+          id: string
+          is_admin: boolean
+          is_super_admin: boolean
+          name: string
+          notification_preference: string | null
+          phone: string | null
+          photo_url: string | null
+          role: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email: string
+          id: string
+          is_admin?: boolean
+          is_super_admin?: boolean
+          name: string
+          notification_preference?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          role: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_admin?: boolean
+          is_super_admin?: boolean
+          name?: string
+          notification_preference?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          role?: string
         }
         Relationships: []
       }

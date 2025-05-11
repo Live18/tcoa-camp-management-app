@@ -62,7 +62,7 @@ export const storeNotification = async (
   type: string = "general"
 ): Promise<boolean> => {
   try {
-    // Use explicit type for the notification object to avoid TypeScript errors
+    // Define notification object with the correct types
     const notification = {
       user_id: userId,
       title,
