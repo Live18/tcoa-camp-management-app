@@ -211,8 +211,6 @@ export type Database = {
           created_at?: string
           email: string
           id: string
-          is_admin?: boolean
-          is_super_admin?: boolean
           name: string
           notification_preference?: string | null
           phone?: string | null
@@ -224,8 +222,6 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
-          is_admin?: boolean
-          is_super_admin?: boolean
           name?: string
           notification_preference?: string | null
           phone?: string | null
