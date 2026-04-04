@@ -51,7 +51,6 @@ export const signUpWithEmail = async (
   password: string,
   userData: {
     name: string;
-    role: string;
   }
 ): Promise<AuthResponse> => {
   try {
@@ -61,7 +60,7 @@ export const signUpWithEmail = async (
       options: {
         data: {
           name: userData.name,
-          role: userData.role,
+          role: "camper",
         },
       },
     });
