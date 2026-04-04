@@ -14,9 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/use-toast";
-import { Pencil, ArrowLeft, Mail, Phone, Bell } from "lucide-react";
+import { Pencil, ArrowLeft, Mail, Phone, Bell, LogOut } from "lucide-react";
 import { usePermission } from "@/contexts/PermissionContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "@/services/authService";
 import {
   Select,
   SelectContent,
@@ -28,7 +29,13 @@ import {
 const Profile = () => {
   const { currentUser, setCurrentUser } = useUser();
   const { can } = usePermission();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
   
   const [formData, setFormData] = useState({
     name: currentUser?.name || "",
@@ -174,14 +181,24 @@ const Profile = () => {
               </CardDescription>
             </div>
             {!isEditing && (
-              <Button 
-                onClick={handleEditClick} 
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Pencil size={16} />
-                Edit Profile
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleEditClick}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Pencil size={16} />
+                  Edit Profile
+                </Button>
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                >
+                  <LogOut size={16} />
+                  Log Out
+                </Button>
+              </div>
             )}
           </div>
         </CardHeader>

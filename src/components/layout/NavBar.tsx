@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -11,14 +11,20 @@ import { Button } from "@/components/ui/button";
 import { UserSwitcher } from "@/components/user/UserSwitcher";
 import { usePermission } from "@/contexts/PermissionContext";
 import { useUser } from "@/contexts/UserContext";
+import { signOut } from "@/services/authService";
 
 export const NavBar: React.FC = () => {
   const navigate = useNavigate();
   const { can } = usePermission();
   const { currentUser } = useUser();
-  
+
   // Only show admin button for admin users
   const showAdminButton = currentUser?.isAdmin;
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-10 w-full border-b bg-background">
@@ -69,6 +75,14 @@ export const NavBar: React.FC = () => {
                     Admin Dashboard
                   </Button>
                 )}
+                <Button
+                  variant="ghost"
+                  className="justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log Out
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
@@ -115,6 +129,14 @@ export const NavBar: React.FC = () => {
               Admin
             </Button>
           )}
+          <Button
+            variant="ghost"
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Log Out
+          </Button>
         </nav>
       </div>
     </header>
