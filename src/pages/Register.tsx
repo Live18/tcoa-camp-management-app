@@ -1,7 +1,6 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +8,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { signUpWithEmail } from "@/services/authService";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
-
-const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY as string;
 
 // Password strength helpers
 interface PasswordRule {
@@ -29,15 +26,13 @@ const getStrengthScore = (pw: string): number =>
   PASSWORD_RULES.filter((r) => r.test(pw)).length;
 
 const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"];
-const strengthColor = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
+const strengthColor  = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
 
 const Register = () => {
   const [name, setName]         = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [loading, setLoading]   = useState(false);
-  const captchaRef = useRef<HCaptcha>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -65,24 +60,11 @@ const Register = () => {
       return;
     }
 
-    if (!captchaToken) {
-      toast({
-        title: "CAPTCHA required",
-        description: "Please complete the CAPTCHA verification.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
 
     const response = await signUpWithEmail(email, password, { name });
 
     setLoading(false);
-
-    // Reset captcha regardless of outcome
-    captchaRef.current?.resetCaptcha();
-    setCaptchaToken(null);
 
     if (!response.success) {
       toast({
@@ -182,7 +164,7 @@ const Register = () => {
                         <li key={rule.label} className="flex items-center gap-1.5 text-xs">
                           {passed
                             ? <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
-                            : <XCircle    className="h-3.5 w-3.5 text-gray-300 shrink-0" />
+                            : <XCircle     className="h-3.5 w-3.5 text-gray-300 shrink-0" />
                           }
                           <span className={passed ? "text-green-700" : "text-gray-500"}>
                             {rule.label}
@@ -195,20 +177,10 @@ const Register = () => {
               )}
             </div>
 
-            {/* hCaptcha */}
-            <div className="flex justify-center pt-1">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={HCAPTCHA_SITE_KEY}
-                onVerify={(token) => setCaptchaToken(token)}
-                onExpire={() => setCaptchaToken(null)}
-              />
-            </div>
-
             <Button
               type="submit"
               className="w-full"
-              disabled={loading || !passwordValid || !captchaToken}
+              disabled={loading || !passwordValid}
             >
               {loading ? (
                 <>
