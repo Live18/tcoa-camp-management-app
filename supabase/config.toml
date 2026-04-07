@@ -1,5 +1,22 @@
 
 project_id = "mmvgiwrlehbzipbhksgs"
 
+[auth]
+site_url = "https://tcoa.app"
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+double_confirm_changes = true
+
+[auth.email.smtp]
+host = "smtp.resend.com"
+port = 587
+user = "resend"
+pass = "re_ADZHMJdE_BYzznNdNPyViiNy1LVbdxUN"
+admin_email = "admin@tcoa.app"
+sender_name = "TCO Academy"
+
 [functions.send-email]
 verify_jwt = true

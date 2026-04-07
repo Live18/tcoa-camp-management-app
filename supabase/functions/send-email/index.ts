@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { to, subject, body, from }: EmailRequest = await req.json();
     
     // Use the provided from email or default to a standard one
-    const fromEmail = from || "notifications@yourdomain.com"; // Replace with your Hover domain
+    const fromEmail = from || "admin@tcoa.app"; // Replace with your Hover domain
     
     const emailResponse = await resend.emails.send({
       from: fromEmail,
