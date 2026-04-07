@@ -3,6 +3,7 @@ import React from "react";
 import { Route, Navigate } from "react-router-dom";
 import { Login } from "@/pages/Login";
 import Register from "@/pages/Register";
+import Verify from "@/pages/Verify";
 import { useUser } from "@/contexts/UserContext";
 
 // Wrapper component to redirect authenticated users away from auth pages
@@ -34,13 +35,15 @@ export const authRoutes = (
         </RedirectIfAuthenticated>
       } 
     />
-    <Route 
-      path="/register" 
+    <Route
+      path="/register"
       element={
         <RedirectIfAuthenticated>
           <Register />
         </RedirectIfAuthenticated>
-      } 
+      }
     />
+    {/* Public — must be accessible without a session */}
+    <Route path="/verify" element={<Verify />} />
   </>
 );

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { signUpWithEmail } from "@/services/authService";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { signUpWithEmail, sendVerificationEmail } from "@/services/authService";
+import { Loader2, CheckCircle2, XCircle, MailCheck } from "lucide-react";
 
 // Password strength helpers
 interface PasswordRule {
@@ -33,6 +33,7 @@ const Register = () => {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
+  const [registered, setRegistered] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -62,11 +63,11 @@ const Register = () => {
 
     setLoading(true);
 
+    // Step 1: Create the account
     const response = await signUpWithEmail(email, password, { name });
 
-    setLoading(false);
-
     if (!response.success) {
+      setLoading(false);
       toast({
         title: "Registration failed",
         description: response.message,
@@ -75,13 +76,42 @@ const Register = () => {
       return;
     }
 
-    toast({
-      title: "Account created!",
-      description: "Check your email for a confirmation link before logging in.",
-    });
+    // Step 2: Send verification email using the returned userId
+    if (response.userId) {
+      await sendVerificationEmail(response.userId, email, name);
+    }
 
-    navigate("/login");
+    setLoading(false);
+    setRegistered(true);
   };
+
+  // Success state — shown after registration + email send
+  if (registered) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <MailCheck className="h-12 w-12 text-primary mx-auto mb-2" />
+            <CardTitle>Check your email</CardTitle>
+            <CardDescription>
+              We sent a verification link to <strong>{email}</strong>.
+              Click it to activate your account before logging in.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Don't see it? Check your spam or junk folder.
+            </p>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <Button variant="link" onClick={() => navigate("/login")}>
+              Back to Login
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -135,7 +165,6 @@ const Register = () => {
                 disabled={loading}
               />
 
-              {/* Strength bar — only shown once the user starts typing */}
               {password.length > 0 && (
                 <div className="space-y-2 pt-1">
                   <div className="flex gap-1 h-1.5">
@@ -155,8 +184,6 @@ const Register = () => {
                   }`}>
                     {strengthLabel[score]}
                   </p>
-
-                  {/* Rule checklist */}
                   <ul className="space-y-1">
                     {PASSWORD_RULES.map((rule) => {
                       const passed = rule.test(password);
@@ -185,7 +212,7 @@ const Register = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registering...
+                  Creating account…
                 </>
               ) : (
                 "Create Account"

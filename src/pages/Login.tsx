@@ -6,19 +6,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithEmail } from "@/services/authService";
-import { supabase } from "@/integrations/supabase/client";
+import { signInWithEmail, sendVerificationEmail } from "@/services/authService";
+import { supabaseAdmin } from "@/integrations/supabase/serviceClient";
 import { Loader2, MailCheck } from "lucide-react";
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail]                     = useState("");
-  const [password, setPassword]               = useState("");
-  const [loading, setLoading]                 = useState(false);
-  const [showResend, setShowResend]           = useState(false);
-  const [resendLoading, setResendLoading]     = useState(false);
-  const [resendSent, setResendSent]           = useState(false);
+  const [email, setEmail]                 = useState("");
+  const [password, setPassword]           = useState("");
+  const [loading, setLoading]             = useState(false);
+  const [showVerify, setShowVerify]       = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent]       = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,24 +33,14 @@ export const Login: React.FC = () => {
     }
 
     setLoading(true);
-    setShowResend(false);
+    setShowVerify(false);
 
     try {
       const response = await signInWithEmail(email, password);
 
       if (!response.success) {
-        // Detect unconfirmed email — Supabase returns this exact message
-        const isUnconfirmed =
-          response.message?.toLowerCase().includes("email not confirmed") ||
-          response.message?.toLowerCase().includes("email link is invalid or has expired");
-
-        if (isUnconfirmed) {
-          setShowResend(true);
-          toast({
-            title: "Email not confirmed",
-            description: "Please verify your email address before logging in.",
-            variant: "destructive",
-          });
+        if (response.emailNotVerified) {
+          setShowVerify(true);
         } else {
           toast({
             title: "Login failed",
@@ -58,15 +48,10 @@ export const Login: React.FC = () => {
             variant: "destructive",
           });
         }
-        setLoading(false);
         return;
       }
 
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
-
+      toast({ title: "Login successful", description: "Welcome back!" });
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
@@ -80,7 +65,7 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleResendConfirmation = async () => {
+  const handleResendVerification = async () => {
     if (!email) {
       toast({
         title: "Email required",
@@ -92,24 +77,37 @@ export const Login: React.FC = () => {
 
     setResendLoading(true);
 
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-    });
+    // Look up the userId by email using service role, then resend
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("id, name")
+      .eq("email", email)
+      .single();
 
-    setResendLoading(false);
-
-    if (error) {
+    if (!profile?.id) {
       toast({
-        title: "Could not resend",
-        description: error.message,
+        title: "Account not found",
+        description: "No account was found for that email address.",
         variant: "destructive",
       });
-    } else {
+      setResendLoading(false);
+      return;
+    }
+
+    const sent = await sendVerificationEmail(profile.id, email, profile.name);
+    setResendLoading(false);
+
+    if (sent) {
       setResendSent(true);
       toast({
-        title: "Confirmation email sent",
-        description: `A new confirmation link has been sent to ${email}.`,
+        title: "Verification email sent",
+        description: `A new verification link has been sent to ${email}.`,
+      });
+    } else {
+      toast({
+        title: "Could not resend",
+        description: "Something went wrong. Please try again in a moment.",
+        variant: "destructive",
       });
     }
   };
@@ -132,7 +130,7 @@ export const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  setShowResend(false);
+                  setShowVerify(false);
                   setResendSent(false);
                 }}
                 required
@@ -163,27 +161,27 @@ export const Login: React.FC = () => {
             </Button>
           </form>
 
-          {/* Resend confirmation banner — shown only after unconfirmed-email error */}
-          {showResend && (
+          {/* Email-not-verified banner */}
+          {showVerify && (
             <div className="rounded-md border border-yellow-300 bg-yellow-50 p-4 space-y-2">
               <div className="flex items-center gap-2 text-yellow-800 font-medium text-sm">
                 <MailCheck className="h-4 w-4 shrink-0" />
-                Your email address has not been confirmed yet.
+                Please verify your email before logging in.
               </div>
               <p className="text-xs text-yellow-700">
-                Check your inbox (and spam folder) for the confirmation link we sent
-                when you registered. Need a new one?
+                Check your inbox (and spam folder) for the verification link.
+                Need a new one?
               </p>
               {resendSent ? (
                 <p className="text-xs font-medium text-green-700">
-                  ✓ Confirmation email sent — please check your inbox.
+                  ✓ Verification email sent — please check your inbox.
                 </p>
               ) : (
                 <Button
                   variant="outline"
                   size="sm"
                   className="w-full border-yellow-400 text-yellow-800 hover:bg-yellow-100"
-                  onClick={handleResendConfirmation}
+                  onClick={handleResendVerification}
                   disabled={resendLoading}
                 >
                   {resendLoading ? (
@@ -192,7 +190,7 @@ export const Login: React.FC = () => {
                       Sending...
                     </>
                   ) : (
-                    "Resend confirmation email"
+                    "Resend verification email"
                   )}
                 </Button>
               )}
