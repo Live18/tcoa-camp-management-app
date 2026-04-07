@@ -17,6 +17,7 @@ user = "resend"
 pass = "re_ADZHMJdE_BYzznNdNPyViiNy1LVbdxUN"
 admin_email = "admin@tcoa.app"
 sender_name = "TCO Academy"
+enabled = false
 
 [functions.send-email]
 verify_jwt = true
