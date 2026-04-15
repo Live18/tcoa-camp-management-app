@@ -13,9 +13,11 @@ import { SessionFormValues } from "../SessionFormSchema";
 
 interface DateFieldProps {
   control: Control<SessionFormValues>;
+  min?: string; // "YYYY-MM-DDThh:mm"
+  max?: string; // "YYYY-MM-DDThh:mm"
 }
 
-const DateField: React.FC<DateFieldProps> = ({ control }) => {
+const DateField: React.FC<DateFieldProps> = ({ control, min, max }) => {
   return (
     <FormField
       control={control}
@@ -24,7 +26,7 @@ const DateField: React.FC<DateFieldProps> = ({ control }) => {
         <FormItem>
           <FormLabel>Date and Time</FormLabel>
           <FormControl>
-            <Input type="datetime-local" {...field} />
+            <Input type="datetime-local" min={min} max={max} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>

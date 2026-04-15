@@ -37,6 +37,8 @@ const Profile = () => {
     navigate("/login");
   };
   
+  const isAdminUser = currentUser?.role === "admin" || currentUser?.role === "super_admin";
+
   const [formData, setFormData] = useState({
     name: currentUser?.name || "",
     email: currentUser?.email || "",
@@ -44,6 +46,7 @@ const Profile = () => {
     phone: currentUser?.phone || "",
     comments: currentUser?.comments || "",
     feedback: currentUser?.feedback || "",
+    admin_notes: currentUser?.admin_notes || "",
     photoUrl: currentUser?.photoUrl || "",
     notificationPreference: currentUser?.notificationPreference || null,
   });
@@ -85,6 +88,7 @@ const Profile = () => {
       phone: currentUser?.phone || "",
       comments: currentUser?.comments || "",
       feedback: currentUser?.feedback || "",
+      admin_notes: currentUser?.admin_notes || "",
       photoUrl: currentUser?.photoUrl || "",
       notificationPreference: currentUser?.notificationPreference || null,
     });
@@ -110,6 +114,7 @@ const Profile = () => {
         phone: formData.phone,
         comments: formData.comments,
         feedback: formData.feedback,
+        admin_notes: isAdminUser ? formData.admin_notes : currentUser.admin_notes,
         photoUrl: formData.photoUrl,
         notificationPreference: formData.notificationPreference,
       });
@@ -334,18 +339,37 @@ const Profile = () => {
                 
                 <div className="space-y-2">
                   <Label htmlFor="comments">Comments (visible to admins only)</Label>
-                  <Textarea 
-                    id="comments" 
-                    name="comments" 
-                    value={formData.comments} 
-                    onChange={handleInputChange} 
-                    rows={4} 
+                  <Textarea
+                    id="comments"
+                    name="comments"
+                    value={formData.comments}
+                    onChange={handleInputChange}
+                    rows={4}
                     placeholder="Share any comments or questions with the event administrators..."
                   />
                   <p className="text-xs text-muted-foreground">
                     Note: These comments are only visible to administrators.
                   </p>
                 </div>
+
+                {isAdminUser && (
+                  <div className="space-y-2 border border-amber-200 bg-amber-50 rounded-md p-4">
+                    <Label htmlFor="admin_notes" className="text-amber-900 font-medium">
+                      Admin Notes (visible to admins only)
+                    </Label>
+                    <Textarea
+                      id="admin_notes"
+                      name="admin_notes"
+                      value={formData.admin_notes}
+                      onChange={handleInputChange}
+                      rows={4}
+                      placeholder="Internal notes visible only to admins…"
+                    />
+                    <p className="text-xs text-amber-700">
+                      These notes are never shown to non-admin users.
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
@@ -427,6 +451,20 @@ const Profile = () => {
                   <Label htmlFor="view-comments">Comments (visible to admins only)</Label>
                   <div className="border border-input bg-background px-3 py-2 rounded-md text-base min-h-[100px]">
                     {currentUser.comments}
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Notes — strictly visible to admin / super_admin users only */}
+              {isAdminUser && (
+                <div className="space-y-2 border border-amber-200 bg-amber-50 rounded-md p-4">
+                  <Label className="text-amber-900 font-medium">
+                    Admin Notes (visible to admins only)
+                  </Label>
+                  <div className="bg-white border border-amber-100 px-3 py-2 rounded-md text-base min-h-[80px]">
+                    {currentUser.admin_notes || (
+                      <span className="text-muted-foreground">No admin notes</span>
+                    )}
                   </div>
                 </div>
               )}

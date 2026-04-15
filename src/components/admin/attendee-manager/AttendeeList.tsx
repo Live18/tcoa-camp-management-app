@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -65,7 +66,12 @@ export const AttendeeList: React.FC<AttendeeListProps> = ({
                     <AvatarImage src={attendee.user.photoUrl} alt={attendee.user.name} />
                     <AvatarFallback>{getInitials(attendee.user.name)}</AvatarFallback>
                   </Avatar>
-                  <span>{attendee.user.name}</span>
+                  <Link
+                    to={`/profile/${attendee.userId}`}
+                    className="hover:underline text-foreground"
+                  >
+                    {attendee.user.name}
+                  </Link>
                 </div>
               ) : (
                 <span>Unknown User</span>

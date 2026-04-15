@@ -40,7 +40,11 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
   const { users } = useUser();
   const { checkUserAvailability } = useAttendeeAvailability();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const [selectedRole, setSelectedRole] = useState<string>(allowedRoles[0]);
+  // Initialise with the first normalised role so the default is never "presenter"
+  const firstNormalizedRole = allowedRoles
+    .map((r) => (r === "presenter" ? "observer" : r))
+    .filter((r, i, arr) => arr.indexOf(r) === i)[0];
+  const [selectedRole, setSelectedRole] = useState<string>(firstNormalizedRole ?? allowedRoles[0]);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
   
   // Update available users whenever attendees or event date changes
@@ -135,12 +139,18 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
   const roleLabel = (role: string) => {
     switch (role) {
       case "admin": return { label: "Admin", className: "bg-red-100 text-red-800" };
-      case "presenter": return { label: "Presenter", className: "bg-blue-100 text-blue-800" };
-      case "observer": return { label: "Observer", className: "bg-green-100 text-green-800" };
+      case "presenter":
+      case "observer": return { label: "Presenter/Observer", className: "bg-green-100 text-green-800" };
       case "camper": return { label: "Camper", className: "bg-gray-100 text-gray-800" };
       default: return { label: role, className: "bg-gray-100 text-gray-800" };
     }
   };
+
+  // Merge "presenter" and "observer" into a single "observer" option so the
+  // dropdown shows one combined "Presenter/Observer" entry.
+  const normalizedRoles = allowedRoles
+    .map((r) => (r === "presenter" ? "observer" : r))
+    .filter((r, i, arr) => arr.indexOf(r) === i);
 
   const getInitials = (name: string) => {
     return name
@@ -167,7 +177,7 @@ export const AttendeeManager: React.FC<AttendeeManagerProps> = ({
           selectedRole={selectedRole}
           setSelectedRole={setSelectedRole}
           availableUsers={availableUsers}
-          allowedRoles={allowedRoles}
+          allowedRoles={normalizedRoles}
           maxAttendees={maxAttendees}
           currentCamperCount={currentCamperCount}
           handleAddAttendee={handleAddAttendee}

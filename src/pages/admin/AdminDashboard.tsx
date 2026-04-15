@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
 import { useGame } from "@/contexts/GameContext";
 import { useClassroomSession } from "@/contexts/ClassroomSessionContext";
 import { useLocation } from "@/contexts/LocationContext";
 import { usePermission } from "@/contexts/PermissionContext";
+import { useCampSettings } from "@/contexts/CampSettingsContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import { useRoleCheck } from "@/hooks/useRoleCheck";
 import {
@@ -17,7 +18,19 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Gamepad, BookOpen, MapPin, Bell, Mail, UserPlus, PowerOff } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Users, Gamepad, BookOpen, MapPin, Bell, Mail, UserPlus, PowerOff, Settings } from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -27,16 +40,85 @@ const AdminDashboard = () => {
   const { locations } = useLocation();
   const { can } = usePermission();
   const { isAdmin } = useRoleCheck();
+  const { campName, campStart, campEnd, loading: settingsLoading, updateCampSettings } = useCampSettings();
+
+  // Camp settings form state
+  const [editingSettings, setEditingSettings] = useState(false);
+  const [settingsForm, setSettingsForm] = useState({
+    campName: campName ?? "",
+    campStart: campStart ?? "",
+    campEnd: campEnd ?? "",
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  // Confirmation dialog state for "Review Assignments"
+  const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
+  const [assignmentBlockReasons, setAssignmentBlockReasons] = useState<string[]>([]);
 
   const unpublishedGameAttendees = getUnpublishedGameAttendees();
   const unpublishedSessionAttendees = getUnpublishedSessionAttendees();
   const totalUnpublishedAttendees = unpublishedGameAttendees + unpublishedSessionAttendees;
 
+  // Sync form when context loads or user begins editing
+  const handleBeginEditSettings = () => {
+    setSettingsForm({
+      campName: campName ?? "",
+      campStart: campStart ?? "",
+      campEnd: campEnd ?? "",
+    });
+    setEditingSettings(true);
+  };
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await updateCampSettings({
+        campName: settingsForm.campName || null,
+        campStart: settingsForm.campStart || null,
+        campEnd: settingsForm.campEnd || null,
+      });
+      setEditingSettings(false);
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  // Check preconditions before navigating to assignments
+  const handleReviewAssignments = () => {
+    const reasons: string[] = [];
+
+    if (!campStart || !campEnd) {
+      reasons.push("Camp dates (start and end) have not been set.");
+    }
+
+    const gamesWithoutLocation = games.filter(
+      (g) => g.attendees.length > 0 && !g.locationId
+    );
+    if (gamesWithoutLocation.length > 0) {
+      reasons.push(
+        `${gamesWithoutLocation.length} game(s) with assigned attendees are missing a location.`
+      );
+    }
+
+    const sessionsWithoutLocation = sessions.filter(
+      (s) => s.attendees.length > 0 && !s.locationId
+    );
+    if (sessionsWithoutLocation.length > 0) {
+      reasons.push(
+        `${sessionsWithoutLocation.length} session(s) with assigned attendees are missing a location.`
+      );
+    }
+
+    if (reasons.length > 0) {
+      setAssignmentBlockReasons(reasons);
+      setShowAssignmentDialog(true);
+    } else {
+      navigate("/admin/assignments");
+    }
+  };
+
   return (
-    <PermissionGate
-      action="user.view"
-      redirectTo="/"
-    >
+    <PermissionGate action="user.view" redirectTo="/">
       <div className="container mx-auto py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -58,10 +140,10 @@ const AdminDashboard = () => {
                     ({unpublishedGameAttendees} for games, {unpublishedSessionAttendees} for sessions)
                   </p>
                 </div>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="bg-white border-yellow-300 text-yellow-800"
-                  onClick={() => navigate("/admin/assignments")}
+                  onClick={handleReviewAssignments}
                 >
                   Review Assignments
                 </Button>
@@ -70,15 +152,41 @@ const AdminDashboard = () => {
           </Card>
         )}
 
+        {/* Soft-block confirmation dialog */}
+        <AlertDialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Some setup items are incomplete</AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div>
+                  <p className="mb-2">
+                    The following issues were found. You can still proceed, but consider
+                    resolving them first:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                    {assignmentBlockReasons.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Go Back</AlertDialogCancel>
+              <AlertDialogAction onClick={() => navigate("/admin/assignments")}>
+                Proceed Anyway
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {can("user.view") && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>User Management</CardTitle>
-                  <CardDescription>
-                    Manage camp users
-                  </CardDescription>
+                  <CardDescription>Manage camp users</CardDescription>
                 </div>
                 <Users className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
@@ -88,7 +196,7 @@ const AdminDashboard = () => {
               </CardContent>
               <CardFooter>
                 <div className="flex flex-col space-y-2 w-full">
-                  <Button 
+                  <Button
                     onClick={() => navigate("/admin/users")}
                     className="w-full"
                     variant={isAdmin ? "default" : "outline"}
@@ -96,7 +204,7 @@ const AdminDashboard = () => {
                   >
                     {isAdmin ? "Manage Users" : "View Users"}
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => navigate("/admin/invitations")}
                     className="w-full"
@@ -114,9 +222,7 @@ const AdminDashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>Location Management</CardTitle>
-                  <CardDescription>
-                    Manage camp locations
-                  </CardDescription>
+                  <CardDescription>Manage camp locations</CardDescription>
                 </div>
                 <MapPin className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
@@ -126,7 +232,7 @@ const AdminDashboard = () => {
               </CardContent>
               <CardFooter>
                 <div className="flex flex-col space-y-2 w-full">
-                  <Button 
+                  <Button
                     onClick={() => navigate("/admin/locations")}
                     className="w-full"
                     variant={isAdmin ? "default" : "outline"}
@@ -134,7 +240,7 @@ const AdminDashboard = () => {
                   >
                     {isAdmin ? "Manage Locations" : "View Locations"}
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => navigate("/admin/locations/new")}
                     className="w-full"
@@ -152,9 +258,7 @@ const AdminDashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>Game Management</CardTitle>
-                  <CardDescription>
-                    Organize and schedule games
-                  </CardDescription>
+                  <CardDescription>Organize and schedule games</CardDescription>
                 </div>
                 <Gamepad className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
@@ -169,7 +273,7 @@ const AdminDashboard = () => {
               </CardContent>
               <CardFooter>
                 <div className="flex flex-col space-y-2 w-full">
-                  <Button 
+                  <Button
                     onClick={() => navigate("/admin/games")}
                     className="w-full"
                     variant={isAdmin ? "default" : "outline"}
@@ -177,7 +281,7 @@ const AdminDashboard = () => {
                   >
                     {isAdmin ? "Manage Games" : "View Games"}
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => navigate("/admin/games/new")}
                     className="w-full"
@@ -195,9 +299,7 @@ const AdminDashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>Classroom Sessions</CardTitle>
-                  <CardDescription>
-                    Manage classroom sessions
-                  </CardDescription>
+                  <CardDescription>Manage classroom sessions</CardDescription>
                 </div>
                 <BookOpen className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
@@ -212,7 +314,7 @@ const AdminDashboard = () => {
               </CardContent>
               <CardFooter>
                 <div className="flex flex-col space-y-2 w-full">
-                  <Button 
+                  <Button
                     onClick={() => navigate("/admin/classroom-sessions")}
                     className="w-full"
                     variant={isAdmin ? "default" : "outline"}
@@ -220,7 +322,7 @@ const AdminDashboard = () => {
                   >
                     {isAdmin ? "Manage Sessions" : "View Sessions"}
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => navigate("/admin/classroom-sessions/new")}
                     className="w-full"
@@ -238,20 +340,18 @@ const AdminDashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>Admin Management</CardTitle>
-                  <CardDescription>
-                    Manage admin accounts
-                  </CardDescription>
+                  <CardDescription>Manage admin accounts</CardDescription>
                 </div>
                 <UserPlus className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent className="pb-2">
                 <div className="text-2xl font-bold">
-                  {users.filter(u => u.isAdmin).length}
+                  {users.filter((u) => u.isAdmin).length}
                 </div>
                 <p className="text-muted-foreground">Admin users</p>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   onClick={() => navigate("/admin/manage-admins")}
                   className="w-full"
                   disabled={!can("admin.manage")}
@@ -267,9 +367,7 @@ const AdminDashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>Notifications</CardTitle>
-                  <CardDescription>
-                    Send updates to users
-                  </CardDescription>
+                  <CardDescription>Send updates to users</CardDescription>
                 </div>
                 <Bell className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
@@ -279,7 +377,7 @@ const AdminDashboard = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => navigate("/admin/notifications")}
                   className="w-full"
@@ -296,9 +394,7 @@ const AdminDashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="space-y-1">
                   <CardTitle>Invitations</CardTitle>
-                  <CardDescription>
-                    Invite new users
-                  </CardDescription>
+                  <CardDescription>Invite new users</CardDescription>
                 </div>
                 <Mail className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
@@ -308,7 +404,7 @@ const AdminDashboard = () => {
                 </p>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => navigate("/admin/invitations")}
                   className="w-full"
@@ -319,9 +415,107 @@ const AdminDashboard = () => {
               </CardFooter>
             </Card>
           )}
+
+          {/* Camp Settings card — admins only */}
+          {can("admin.manage") && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="space-y-1">
+                  <CardTitle>Camp Settings</CardTitle>
+                  <CardDescription>Name and dates for this camp</CardDescription>
+                </div>
+                <Settings className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {settingsLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading…</p>
+                ) : editingSettings ? (
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="cs-name">Camp Name</Label>
+                      <Input
+                        id="cs-name"
+                        value={settingsForm.campName}
+                        onChange={(e) =>
+                          setSettingsForm((f) => ({ ...f, campName: e.target.value }))
+                        }
+                        placeholder="e.g. Summer Basketball Camp 2026"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="cs-start">Start Date</Label>
+                      <Input
+                        id="cs-start"
+                        type="date"
+                        value={settingsForm.campStart}
+                        onChange={(e) =>
+                          setSettingsForm((f) => ({ ...f, campStart: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="cs-end">End Date</Label>
+                      <Input
+                        id="cs-end"
+                        type="date"
+                        value={settingsForm.campEnd}
+                        onChange={(e) =>
+                          setSettingsForm((f) => ({ ...f, campEnd: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1 text-sm">
+                    <p>
+                      <span className="font-medium">Name: </span>
+                      {campName ?? <span className="text-muted-foreground">Not set</span>}
+                    </p>
+                    <p>
+                      <span className="font-medium">Start: </span>
+                      {campStart ?? <span className="text-muted-foreground">Not set</span>}
+                    </p>
+                    <p>
+                      <span className="font-medium">End: </span>
+                      {campEnd ?? <span className="text-muted-foreground">Not set</span>}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                {editingSettings ? (
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setEditingSettings(false)}
+                      disabled={savingSettings}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={handleSaveSettings}
+                      disabled={savingSettings}
+                    >
+                      {savingSettings ? "Saving…" : "Save"}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleBeginEditSettings}
+                  >
+                    Edit Settings
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          )}
         </div>
 
-        {/* End Camp Section - Moved to the bottom of the page */}
+        {/* End Camp Section */}
         {can("admin.manage") && (
           <Card className="mt-12 border-red-200 bg-red-50">
             <CardContent className="py-4">
@@ -332,8 +526,8 @@ const AdminDashboard = () => {
                     End the current camp and prepare for a new one
                   </p>
                 </div>
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   className="gap-2"
                   onClick={() => navigate("/admin/end-camp")}
                 >

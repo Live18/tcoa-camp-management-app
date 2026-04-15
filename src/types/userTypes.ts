@@ -16,6 +16,7 @@ export interface User {
   isSuperAdmin?: boolean;
   comments?: string;
   feedback?: string;
+  admin_notes?: string;
   notificationPreference?: NotificationPreference;
 }
 

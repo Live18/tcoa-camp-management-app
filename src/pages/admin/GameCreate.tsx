@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useGame } from "@/contexts/GameContext";
 import { useLocation } from "@/contexts/LocationContext";
 import { usePermission } from "@/contexts/PermissionContext";
+import { useCampSettings } from "@/contexts/CampSettingsContext";
 import { PermissionGate } from "@/components/auth/PermissionGate";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,6 +52,7 @@ const GameCreate = () => {
   const navigate = useNavigate();
   const { addGame } = useGame();
   const { locations } = useLocation();
+  const { campStart, campEnd } = useCampSettings();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -159,7 +161,12 @@ const GameCreate = () => {
                       <FormItem>
                         <FormLabel>Date and Time</FormLabel>
                         <FormControl>
-                          <Input type="datetime-local" {...field} />
+                          <Input
+                            type="datetime-local"
+                            min={campStart ? `${campStart}T00:00` : undefined}
+                            max={campEnd ? `${campEnd}T23:59` : undefined}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

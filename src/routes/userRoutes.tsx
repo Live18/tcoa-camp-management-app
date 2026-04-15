@@ -4,6 +4,7 @@ import { Route } from "react-router-dom";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import Home from "@/pages/Home";
 import Profile from "@/pages/Profile";
+import UserProfile from "@/pages/UserProfile";
 import Games from "@/pages/Games";
 import GameDetails from "@/pages/GameDetails";
 import ClassroomSessions from "@/pages/ClassroomSessions";
@@ -24,6 +25,14 @@ export const userRoutes = (
       element={
         <AuthGuard>
           <Profile />
+        </AuthGuard>
+      }
+    />
+    <Route
+      path="/profile/:userId"
+      element={
+        <AuthGuard>
+          <UserProfile />
         </AuthGuard>
       }
     />

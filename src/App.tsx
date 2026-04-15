@@ -6,6 +6,7 @@ import { PermissionProvider } from "@/contexts/PermissionContext";
 import { GameProvider } from "@/contexts/GameContext";
 import { ClassroomSessionProvider } from "@/contexts/ClassroomSessionContext";
 import { LocationProvider } from "@/contexts/LocationContext";
+import { CampSettingsProvider } from "@/contexts/CampSettingsContext";
 
 // Import route groups
 import { authRoutes } from "@/routes/authRoutes";
@@ -16,6 +17,7 @@ function App() {
   return (
     <UserProvider>
       <PermissionProvider>
+        <CampSettingsProvider>
         <LocationProvider>
           <GameProvider>
             <ClassroomSessionProvider>
@@ -34,6 +36,7 @@ function App() {
             </ClassroomSessionProvider>
           </GameProvider>
         </LocationProvider>
+        </CampSettingsProvider>
       </PermissionProvider>
     </UserProvider>
   );
